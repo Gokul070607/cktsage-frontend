@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>CKTSage</title>
+</head>
+
+<body>
+
+  <script>
+    (() => {
+
+      const AUTH_KEY =
+        "cktsage-auth";
+
+
+      let auth =
+        null;
+
+
+      try {
+
+        auth =
+          JSON.parse(
+            localStorage.getItem(
+              AUTH_KEY
+            ) || "null"
+          );
+
+      } catch (error) {
+
+        auth =
+          null;
+      }
+
+
+      if (
+        auth &&
+        auth.access_token
+      ) {
+
+        window.location.replace(
+          "index.html"
+        );
+
+      } else {
+
+        window.location.replace(
+          "login.html"
+        );
+
+      }
+
+    })();
+  </script>
+
+</body>
+
+</html>

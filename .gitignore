@@ -1,0 +1,6 @@
+frontend.zip
+.env
+.env.*
+.vscode/
+.idea/
+.DS_Store

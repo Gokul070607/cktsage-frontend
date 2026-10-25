@@ -1,0 +1,19 @@
+{
+  "name": "cktsage-main-and-chat",
+  "version": "1.0.0",
+  "private": true,
+  "description": "cktsage electronics workbench with separate login, main, and chat pages",
+  "files": [
+    "index.html",
+    "styles.css",
+    "script.js",
+    "chat.html",
+    "chat.css",
+    "chat.js",
+    "config.json",
+    "README.md",
+    "login.html",
+    "login.css",
+    "login.js"
+  ]
+}

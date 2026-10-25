@@ -1,0 +1,1228 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="theme-color"
+    content="#080808"
+  >
+
+  <title>Sign in — cktsage</title>
+
+  <link
+    rel="stylesheet"
+    href="login.css"
+  >
+</head>
+
+
+<body>
+
+  <!-- =====================================================
+       CHECK FOR SAVED LOGIN
+  ====================================================== -->
+
+  <script>
+    (() => {
+
+      const AUTH_KEY =
+        "cktsage-auth";
+
+
+      let auth =
+        null;
+
+
+      try {
+
+        auth =
+          JSON.parse(
+            localStorage.getItem(
+              AUTH_KEY
+            ) || "null"
+          );
+
+      } catch (error) {
+
+        auth =
+          null;
+      }
+
+
+      if (
+        auth &&
+        auth.access_token
+      ) {
+
+        window.location.replace(
+          "index.html"
+        );
+      }
+
+    })();
+  </script>
+
+
+  <!-- =====================================================
+       BACKGROUND
+  ====================================================== -->
+
+  <div class="login-ambient ambient-one"></div>
+  <div class="login-ambient ambient-two"></div>
+  <div class="login-grain"></div>
+
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <header class="login-header">
+
+    <a
+      class="brand"
+      href="index.html"
+      aria-label="cktsage home"
+    >
+
+      <span class="brand-mark">
+        ϟ
+      </span>
+
+      <span>
+        cktsage
+      </span>
+
+    </a>
+
+
+    <a
+      class="back-link"
+      href="index.html"
+    >
+      ← Back to home
+    </a>
+
+  </header>
+
+
+  <!-- =====================================================
+       MAIN
+  ====================================================== -->
+
+  <main class="login-layout">
+
+
+    <!-- ===================================================
+         LEFT PROMO
+    ==================================================== -->
+
+    <section class="login-promo">
+
+      <div class="eyebrow">
+
+        <span></span>
+
+        YOUR ELECTRONICS WORKBENCH
+
+      </div>
+
+
+      <h1>
+
+        Good ideas
+
+        <br>
+
+        start with
+
+        <em>
+          a spark.
+        </em>
+
+      </h1>
+
+
+      <p>
+
+        Sign in to pick up your circuit explorations
+        and keep your workspace close.
+
+      </p>
+
+
+      <div
+        class="promo-visual"
+        aria-hidden="true"
+      >
+
+        <div class="orbit orbit-a"></div>
+        <div class="orbit orbit-b"></div>
+
+
+        <div class="spark-core">
+          ϟ
+        </div>
+
+
+        <i class="trace trace-a"></i>
+        <i class="trace trace-b"></i>
+        <i class="trace trace-c"></i>
+
+
+        <span class="chip chip-a">
+          V+
+        </span>
+
+        <span class="chip chip-b">
+          GND
+        </span>
+
+        <span class="chip chip-c">
+          Ω
+        </span>
+
+      </div>
+
+
+      <div class="promo-foot">
+
+        <span class="status-dot"></span>
+
+        THINK · BUILD · DISCOVER
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         AUTH CARD
+    ==================================================== -->
+
+    <section
+      class="auth-card"
+      aria-labelledby="auth-title"
+    >
+
+      <div class="auth-top">
+
+        <div class="auth-mark">
+          ϟ
+        </div>
+
+
+        <div>
+
+          <div class="auth-kicker">
+            WELCOME TO CKTSAGE
+          </div>
+
+          <h2 id="auth-title">
+            Sign in
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <p
+        class="auth-subtitle"
+        id="auth-subtitle"
+      >
+        Continue to your electronics workspace.
+      </p>
+
+
+      <!-- =================================================
+           SIGN IN / CREATE ACCOUNT
+      ================================================== -->
+
+      <div
+        class="auth-tabs"
+        role="tablist"
+        aria-label="Authentication mode"
+      >
+
+        <button
+          type="button"
+          class="auth-tab active"
+          id="signin-tab"
+          role="tab"
+          aria-selected="true"
+        >
+          Sign in
+        </button>
+
+
+        <button
+          type="button"
+          class="auth-tab"
+          id="signup-tab"
+          role="tab"
+          aria-selected="false"
+        >
+          Create account
+        </button>
+
+      </div>
+
+
+      <!-- =================================================
+           FORM
+      ================================================== -->
+
+      <form
+        id="auth-form"
+        novalidate
+      >
+
+        <!-- NAME -->
+
+        <label
+          for="name"
+          id="name-label"
+          hidden
+        >
+          Your name
+        </label>
+
+
+        <input
+          id="name"
+          name="name"
+          type="text"
+          placeholder="Your name"
+          autocomplete="name"
+          hidden
+        >
+
+
+        <!-- EMAIL -->
+
+        <label for="email">
+          Email address
+        </label>
+
+
+        <input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        >
+
+
+        <!-- PASSWORD -->
+
+        <div class="password-label">
+
+          <label for="password">
+            Password
+          </label>
+
+
+          <button
+            type="button"
+            id="toggle-password"
+          >
+            Show
+          </button>
+
+        </div>
+
+
+        <input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+          minlength="6"
+          required
+        >
+
+
+        <!-- CONFIRM PASSWORD -->
+
+        <label
+          id="confirm-password-label"
+          for="confirm-password"
+          hidden
+        >
+          Confirm password
+        </label>
+
+
+        <input
+          id="confirm-password"
+          name="confirm-password"
+          type="password"
+          placeholder="Enter your password again"
+          autocomplete="new-password"
+          minlength="6"
+          hidden
+        >
+
+
+        <!-- =================================================
+             FORGOT PASSWORD
+        ================================================== -->
+
+        <div class="form-meta">
+
+          <span></span>
+
+
+          <button
+            type="button"
+            id="forgot-password"
+            class="text-button"
+          >
+            Forgot password?
+          </button>
+
+        </div>
+
+
+        <!-- SUBMIT -->
+
+        <button
+          class="submit-button"
+          id="submit-button"
+          type="submit"
+        >
+
+          <span id="submit-label">
+            Sign in
+          </span>
+
+          <span aria-hidden="true">
+            ↗
+          </span>
+
+        </button>
+
+
+        <p
+          class="form-message"
+          id="form-message"
+          role="status"
+          aria-live="polite"
+        ></p>
+
+      </form>
+
+
+      <div class="auth-divider">
+
+        <span>
+          YOUR WORKSPACE
+        </span>
+
+      </div>
+
+
+      <p class="auth-foot">
+
+        Sign in to access your conversations,
+        saved resources, and cktsage workspace.
+
+      </p>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+       FOOTER
+  ====================================================== -->
+
+  <footer class="login-footer">
+
+    <span>
+      © cktsage
+    </span>
+
+    <span>
+      Built for curious minds and makers.
+    </span>
+
+  </footer>
+
+
+  <!-- =====================================================
+       COMMON BACKEND CONFIG
+       MUST LOAD BEFORE LOGIN LOGIC
+  ====================================================== -->
+
+  <script src="web.js?v=2"></script>
+
+
+  <!-- =====================================================
+       LOGIN LOGIC
+  ====================================================== -->
+
+  <script>
+
+    (() => {
+
+      "use strict";
+
+
+      // ===================================================
+      // BACKEND
+      // ===================================================
+
+      if (
+        !window.CKTSAGE_CONFIG ||
+        !window.CKTSAGE_CONFIG.API_BASE
+      ) {
+
+        console.error(
+          "CKTSage backend configuration is missing."
+        );
+
+        return;
+      }
+
+
+      const API_BASE =
+        window.CKTSAGE_CONFIG.API_BASE;
+
+
+      const AUTH_KEY =
+        "cktsage-auth";
+
+
+      // ===================================================
+      // ELEMENTS
+      // ===================================================
+
+      const form =
+        document.getElementById(
+          "auth-form"
+        );
+
+
+      const signInTab =
+        document.getElementById(
+          "signin-tab"
+        );
+
+
+      const signUpTab =
+        document.getElementById(
+          "signup-tab"
+        );
+
+
+      const title =
+        document.getElementById(
+          "auth-title"
+        );
+
+
+      const subtitle =
+        document.getElementById(
+          "auth-subtitle"
+        );
+
+
+      const nameLabel =
+        document.getElementById(
+          "name-label"
+        );
+
+
+      const nameInput =
+        document.getElementById(
+          "name"
+        );
+
+
+      const emailInput =
+        document.getElementById(
+          "email"
+        );
+
+
+      const passwordInput =
+        document.getElementById(
+          "password"
+        );
+
+
+      const confirmLabel =
+        document.getElementById(
+          "confirm-password-label"
+        );
+
+
+      const confirmInput =
+        document.getElementById(
+          "confirm-password"
+        );
+
+
+      const togglePassword =
+        document.getElementById(
+          "toggle-password"
+        );
+
+
+      const forgotPassword =
+        document.getElementById(
+          "forgot-password"
+        );
+
+
+      const submitButton =
+        document.getElementById(
+          "submit-button"
+        );
+
+
+      const submitLabel =
+        document.getElementById(
+          "submit-label"
+        );
+
+
+      const message =
+        document.getElementById(
+          "form-message"
+        );
+
+
+      // ===================================================
+      // STATE
+      // ===================================================
+
+      let mode =
+        "signin";
+
+
+      // ===================================================
+      // MESSAGE
+      // ===================================================
+
+      function showMessage(
+        text,
+        error = false
+      ) {
+
+        message.textContent =
+          text;
+
+
+        message.className =
+          error
+            ? "form-message error"
+            : "form-message";
+      }
+
+
+      // ===================================================
+      // AUTH MODE
+      // ===================================================
+
+      function setMode(
+        nextMode
+      ) {
+
+        mode =
+          nextMode;
+
+
+        const signup =
+          mode ===
+          "signup";
+
+
+        signInTab.classList.toggle(
+          "active",
+          !signup
+        );
+
+
+        signUpTab.classList.toggle(
+          "active",
+          signup
+        );
+
+
+        signInTab.setAttribute(
+          "aria-selected",
+          String(
+            !signup
+          )
+        );
+
+
+        signUpTab.setAttribute(
+          "aria-selected",
+          String(
+            signup
+          )
+        );
+
+
+        nameLabel.hidden =
+          !signup;
+
+
+        nameInput.hidden =
+          !signup;
+
+
+        nameInput.required =
+          signup;
+
+
+        confirmLabel.hidden =
+          !signup;
+
+
+        confirmInput.hidden =
+          !signup;
+
+
+        confirmInput.required =
+          signup;
+
+
+        confirmInput.value =
+          "";
+
+
+        title.textContent =
+          signup
+            ? "Create your account"
+            : "Sign in";
+
+
+        subtitle.textContent =
+          signup
+            ? "Set up your cktsage workspace."
+            : "Continue to your electronics workspace.";
+
+
+        submitLabel.textContent =
+          signup
+            ? "Create account"
+            : "Sign in";
+
+
+        passwordInput.autocomplete =
+          signup
+            ? "new-password"
+            : "current-password";
+
+
+        showMessage(
+          ""
+        );
+      }
+
+
+      // ===================================================
+      // TAB EVENTS
+      // ===================================================
+
+      signInTab.addEventListener(
+        "click",
+        () => {
+
+          setMode(
+            "signin"
+          );
+
+        }
+      );
+
+
+      signUpTab.addEventListener(
+        "click",
+        () => {
+
+          setMode(
+            "signup"
+          );
+
+        }
+      );
+
+
+      // ===================================================
+      // PASSWORD SHOW / HIDE
+      // ===================================================
+
+      togglePassword.addEventListener(
+        "click",
+        () => {
+
+          const show =
+            passwordInput.type ===
+            "password";
+
+
+          passwordInput.type =
+            show
+              ? "text"
+              : "password";
+
+
+          confirmInput.type =
+            show
+              ? "text"
+              : "password";
+
+
+          togglePassword.textContent =
+            show
+              ? "Hide"
+              : "Show";
+
+
+          passwordInput.focus();
+        }
+      );
+
+
+      // ===================================================
+      // FORGOT PASSWORD
+      // ===================================================
+
+      forgotPassword.addEventListener(
+        "click",
+        () => {
+
+          showMessage(
+            "Password reset is not configured yet."
+          );
+
+        }
+      );
+
+
+      // ===================================================
+      // API REQUEST
+      // ===================================================
+
+      async function postJSON(
+        path,
+        data
+      ) {
+
+        let response;
+
+
+        try {
+
+          response =
+            await fetch(
+              `${API_BASE}${path}`,
+              {
+
+                method:
+                  "POST",
+
+                headers: {
+
+                  "Content-Type":
+                    "application/json"
+
+                },
+
+                body:
+                  JSON.stringify(
+                    data
+                  )
+
+              }
+            );
+
+        } catch (error) {
+
+          console.error(
+            "Backend connection error:",
+            error
+          );
+
+
+          throw new Error(
+            "Cannot connect to backend."
+          );
+        }
+
+
+        let result =
+          null;
+
+
+        try {
+
+          result =
+            await response.json();
+
+        } catch (error) {
+
+          result =
+            null;
+        }
+
+
+        if (
+          !response.ok
+        ) {
+
+          let detail =
+            result?.detail ||
+            result?.message ||
+            `Backend error ${response.status}`;
+
+
+          if (
+            Array.isArray(
+              detail
+            )
+          ) {
+
+            detail =
+              detail
+                .map(
+                  item =>
+                    item.msg ||
+                    JSON.stringify(
+                      item
+                    )
+                )
+                .join(
+                  ", "
+                );
+          }
+
+
+          throw new Error(
+            detail
+          );
+        }
+
+
+        return result;
+      }
+
+
+      // ===================================================
+      // FORM SUBMIT
+      // ===================================================
+
+      form.addEventListener(
+        "submit",
+        async event => {
+
+          event.preventDefault();
+
+          event.stopPropagation();
+
+
+          showMessage(
+            ""
+          );
+
+
+          const email =
+            emailInput.value
+              .trim()
+              .toLowerCase();
+
+
+          const password =
+            passwordInput.value;
+
+
+          // =================================================
+          // VALIDATION
+          // =================================================
+
+          if (
+            !email
+          ) {
+
+            showMessage(
+              "Enter your email address.",
+              true
+            );
+
+
+            emailInput.focus();
+
+
+            return;
+          }
+
+
+          if (
+            !emailInput.checkValidity()
+          ) {
+
+            showMessage(
+              "Enter a valid email address.",
+              true
+            );
+
+
+            emailInput.focus();
+
+
+            return;
+          }
+
+
+          if (
+            password.length < 6
+          ) {
+
+            showMessage(
+              "Password must contain at least 6 characters.",
+              true
+            );
+
+
+            passwordInput.focus();
+
+
+            return;
+          }
+
+
+          if (
+            mode === "signup" &&
+            !nameInput.value.trim()
+          ) {
+
+            showMessage(
+              "Enter your name.",
+              true
+            );
+
+
+            nameInput.focus();
+
+
+            return;
+          }
+
+
+          if (
+            mode === "signup" &&
+            password !==
+              confirmInput.value
+          ) {
+
+            showMessage(
+              "Passwords do not match.",
+              true
+            );
+
+
+            confirmInput.focus();
+
+
+            return;
+          }
+
+
+          submitButton.disabled =
+            true;
+
+
+          submitLabel.textContent =
+            mode === "signup"
+              ? "Creating account…"
+              : "Signing in…";
+
+
+          try {
+
+            // ===============================================
+            // CREATE ACCOUNT
+            // ===============================================
+
+            if (
+              mode ===
+              "signup"
+            ) {
+
+              await postJSON(
+                "/register",
+                {
+
+                  name:
+                    nameInput.value.trim(),
+
+                  email:
+                    email,
+
+                  password:
+                    password
+
+                }
+              );
+
+
+              setMode(
+                "signin"
+              );
+
+
+              emailInput.value =
+                email;
+
+
+              passwordInput.value =
+                "";
+
+
+              confirmInput.value =
+                "";
+
+
+              showMessage(
+                "Account created. Sign in with your new account."
+              );
+
+
+              passwordInput.focus();
+
+
+            // ===============================================
+            // SIGN IN
+            // ===============================================
+
+            } else {
+
+              const data =
+                await postJSON(
+                  "/login",
+                  {
+
+                    email:
+                      email,
+
+                    password:
+                      password
+
+                  }
+                );
+
+
+              if (
+                !data ||
+                !data.access_token
+              ) {
+
+                throw new Error(
+                  "No access token returned by backend."
+                );
+              }
+
+
+              // =============================================
+              // SAVE LOGIN UNTIL MANUAL SIGN OUT
+              // =============================================
+
+              localStorage.setItem(
+                AUTH_KEY,
+                JSON.stringify({
+
+                  access_token:
+                    data.access_token,
+
+                  token_type:
+                    data.token_type ||
+                    "bearer",
+
+                  user:
+                    data.user ||
+                    null
+
+                })
+              );
+
+
+              showMessage(
+                "Signed in successfully."
+              );
+
+
+              // =============================================
+              // LOGIN -> INDEX
+              // =============================================
+
+              window.location.replace(
+                "index.html"
+              );
+
+            }
+
+
+          } catch (error) {
+
+            console.error(
+              "Authentication error:",
+              error
+            );
+
+
+            showMessage(
+              error?.message ||
+              "Authentication failed.",
+              true
+            );
+
+
+          } finally {
+
+            submitButton.disabled =
+              false;
+
+
+            submitLabel.textContent =
+              mode === "signup"
+                ? "Create account"
+                : "Sign in";
+          }
+
+        }
+      );
+
+
+      // ===================================================
+      // INITIAL MODE
+      // ===================================================
+
+      setMode(
+        "signin"
+      );
+
+
+    })();
+
+  </script>
+
+
+</body>
+
+</html>

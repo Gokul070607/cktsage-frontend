@@ -1,0 +1,988 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="theme-color"
+    content="#080808"
+  >
+
+  <title>cktsage — Circuit Analyzer</title>
+
+  <link
+    rel="stylesheet"
+    href="chat.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="simulation.css?v=9"
+  >
+
+  <!-- =====================================================
+       MATHJAX CONFIGURATION
+  ====================================================== -->
+
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [
+          ["\\(", "\\)"],
+          ["$", "$"]
+        ],
+
+        displayMath: [
+          ["\\[", "\\]"],
+          ["$$", "$$"]
+        ],
+
+        processEscapes: true
+      },
+
+      options: {
+        skipHtmlTags: [
+          "script",
+          "noscript",
+          "style",
+          "textarea",
+          "pre",
+          "code"
+        ]
+      },
+
+      startup: {
+        typeset: false
+      }
+    };
+  </script>
+
+  <script
+    id="MathJax-script"
+    async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+  ></script>
+
+</head>
+
+
+<body>
+
+  <div
+    class="chat-shell simulation-shell"
+    id="simulation-shell"
+  >
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside
+      class="sidebar"
+      id="sidebar"
+    >
+
+      <a
+        class="brand"
+        href="index.html"
+        style="
+          text-decoration:none;
+          color:inherit;
+        "
+      >
+
+        <span class="brand-mark">
+          ϟ
+        </span>
+
+        <span>
+          cktsage
+        </span>
+
+      </a>
+
+
+      <a
+        class="sidebar-nav-link"
+        href="chat.html"
+      >
+
+        <span class="sidebar-nav-icon">
+          ✦
+        </span>
+
+        <span>
+          Chat
+        </span>
+
+        <span class="sidebar-nav-arrow">
+          ↗
+        </span>
+
+      </a>
+
+
+      <a
+        class="sidebar-nav-link"
+        href="library.html"
+      >
+
+        <span class="sidebar-nav-icon">
+          ▤
+        </span>
+
+        <span>
+          Libraries
+        </span>
+
+        <span class="sidebar-nav-arrow">
+          ↗
+        </span>
+
+      </a>
+
+
+      <a
+        class="sidebar-nav-link simulation-active"
+        href="simulation.html"
+      >
+
+        <span class="sidebar-nav-icon">
+          ⚡
+        </span>
+
+        <span>
+          Analyze
+        </span>
+
+        <span class="sidebar-nav-arrow">
+          ↗
+        </span>
+
+      </a>
+
+
+      <div class="simulation-side-info">
+
+        <span>
+          CIRCUIT ANALYZER
+        </span>
+
+        <p>
+          Upload a circuit schematic,
+          image, PDF or netlist and let
+          CKTSage identify and explain it.
+        </p>
+
+      </div>
+
+
+      <div class="sidebar-bottom">
+
+        <span class="brand-mark">
+          ϟ
+        </span>
+
+        <span id="sidebar-user-name">
+          User
+        </span>
+
+        <small>
+          Electronics assistant
+        </small>
+
+      </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="simulation-main">
+
+
+      <header class="topbar">
+
+        <button
+          class="mobile-toggle"
+          id="mobile-toggle"
+          type="button"
+          aria-label="Toggle sidebar"
+        >
+          ☰
+        </button>
+
+
+        <span class="mode">
+          CIRCUIT ANALYZER
+        </span>
+
+
+        <a
+          class="account-link user-profile-link"
+          id="user-profile-link"
+          href="profile.html"
+        >
+
+          <span
+            class="user-profile-icon"
+            id="user-profile-icon"
+          >
+            ◉
+          </span>
+
+          <span id="user-profile-name">
+            Account
+          </span>
+
+        </a>
+
+      </header>
+
+
+      <button
+        class="sidebar-scrim"
+        id="sidebar-scrim"
+        type="button"
+        aria-label="Close sidebar"
+      ></button>
+
+
+      <!-- ===================================================
+           SCROLLABLE CONTENT
+      ==================================================== -->
+
+      <section class="simulation-content">
+
+
+        <!-- =================================================
+             PAGE HEADER
+        ================================================== -->
+
+        <div class="simulation-heading">
+
+          <div class="simulation-eyebrow">
+            AI CIRCUIT LAB
+          </div>
+
+
+          <h1>
+            Analyze your circuit.
+          </h1>
+
+
+          <p>
+            Upload a schematic, circuit image, PDF,
+            SPICE netlist or circuit description.
+            CKTSage will identify components,
+            connections and explain how the circuit works.
+          </p>
+
+        </div>
+
+
+        <!-- =================================================
+             UPLOAD CARD
+        ================================================== -->
+
+        <section class="simulation-card">
+
+          <div class="card-title-row">
+
+            <div>
+
+              <span class="step-number">
+                01
+              </span>
+
+              <h2>
+                Upload circuit
+              </h2>
+
+            </div>
+
+
+            <span
+              id="upload-status-badge"
+              class="status-badge"
+            >
+              Waiting
+            </span>
+
+          </div>
+
+
+          <div
+            class="upload-zone"
+            id="upload-zone"
+            tabindex="0"
+            role="button"
+            aria-label="Upload circuit file"
+          >
+
+            <input
+              id="simulation-file"
+              type="file"
+              accept="image/*,.pdf,.txt,.md,.json,.cir,.sp,.net"
+              hidden
+            >
+
+
+            <div class="upload-icon">
+              ⚡
+            </div>
+
+
+            <h3>
+              Drop your circuit here
+            </h3>
+
+
+            <p>
+              PNG, JPG, WEBP, PDF, TXT,
+              JSON, CIR, SP or NET
+            </p>
+
+
+            <button
+              id="choose-file"
+              class="sim-primary-button"
+              type="button"
+            >
+              Choose file
+            </button>
+
+          </div>
+
+
+          <!-- =================================================
+               SELECTED FILE
+          ================================================== -->
+
+          <div
+            class="selected-circuit-file"
+            id="selected-circuit-file"
+            hidden
+          >
+
+            <div
+              class="file-preview"
+              id="file-preview"
+            >
+
+              <span id="file-preview-icon">
+                📄
+              </span>
+
+              <img
+                id="image-preview"
+                alt="Selected circuit"
+                hidden
+              >
+
+            </div>
+
+
+            <div class="file-details">
+
+              <strong id="selected-file-name">
+                Circuit
+              </strong>
+
+              <span id="selected-file-meta">
+                —
+              </span>
+
+            </div>
+
+
+            <button
+              id="remove-file"
+              class="sim-icon-button"
+              type="button"
+              title="Remove file"
+              aria-label="Remove selected file"
+            >
+              ×
+            </button>
+
+          </div>
+
+
+          <!-- =================================================
+               ANALYZE BUTTON
+          ================================================== -->
+
+          <button
+            id="analyze-button"
+            class="analyze-button"
+            type="button"
+          >
+
+            <span>
+              ⚡
+            </span>
+
+            Analyze circuit
+
+          </button>
+
+
+          <div
+            id="simulation-status"
+            class="simulation-status"
+            aria-live="polite"
+          ></div>
+
+        </section>
+
+
+        <!-- =================================================
+             RESULTS
+        ================================================== -->
+
+        <section
+          class="simulation-card detected-card"
+          id="detected-card"
+          hidden
+        >
+
+          <div class="card-title-row">
+
+            <div>
+
+              <span class="step-number">
+                02
+              </span>
+
+              <h2>
+                Circuit analysis
+              </h2>
+
+            </div>
+
+
+            <span class="status-badge ready">
+              Recognized
+            </span>
+
+          </div>
+
+
+          <!-- =================================================
+               RESULT TABS
+          ================================================== -->
+
+          <div
+            class="result-tabs"
+            role="tablist"
+          >
+
+            <button
+              class="result-tab active"
+              data-view="circuit"
+              type="button"
+            >
+              ⚡ Circuit
+            </button>
+
+
+            <button
+              class="result-tab"
+              data-view="graphs"
+              type="button"
+            >
+              📈 Graphs
+            </button>
+
+
+            <button
+              class="result-tab"
+              data-view="table"
+              type="button"
+            >
+              ▦ Table
+            </button>
+
+          </div>
+
+
+          <!-- =================================================
+               CIRCUIT VIEW
+          ================================================== -->
+
+          <div
+            class="result-view active"
+            id="view-circuit"
+          >
+
+            <div class="summary-grid">
+
+
+              <div class="summary-card">
+
+                <span>
+                  CIRCUIT
+                </span>
+
+                <strong
+                  id="summary-circuit-name"
+                >
+                  —
+                </strong>
+
+              </div>
+
+
+              <div class="summary-card">
+
+                <span>
+                  COMPONENTS
+                </span>
+
+                <strong
+                  id="summary-component-count"
+                >
+                  0
+                </strong>
+
+              </div>
+
+
+              <div class="summary-card">
+
+                <span>
+                  INPUT
+                </span>
+
+                <strong
+                  id="summary-input"
+                >
+                  —
+                </strong>
+
+              </div>
+
+
+              <div class="summary-card">
+
+                <span>
+                  OUTPUT
+                </span>
+
+                <strong
+                  id="summary-output"
+                >
+                  —
+                </strong>
+
+              </div>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="analysis-block">
+
+              <h4>
+                Circuit description
+              </h4>
+
+              <p
+                id="circuit-description"
+              >
+                Circuit information will appear here
+                after analysis.
+              </p>
+
+            </div>
+
+
+            <!-- WORKING PRINCIPLE -->
+
+            <div class="analysis-block">
+
+              <h4>
+                How this circuit works
+              </h4>
+
+              <p
+                id="working-principle"
+              >
+                CKTSage will explain the working principle
+                after the circuit is recognized.
+              </p>
+
+            </div>
+
+
+            <!-- POWER SOURCE -->
+
+            <div class="analysis-block">
+
+              <h4>
+                Power source
+              </h4>
+
+              <div
+                id="power-source-list"
+                class="info-list"
+              >
+                No power source analyzed yet.
+              </div>
+
+            </div>
+
+
+            <!-- WARNINGS -->
+
+            <div class="analysis-block">
+
+              <h4>
+                Warnings / uncertain items
+              </h4>
+
+              <div
+                id="warning-list"
+                class="info-list"
+              >
+                No warnings.
+              </div>
+
+            </div>
+
+
+            <!-- STRUCTURE -->
+
+            <div class="netlist-preview">
+
+              <div class="netlist-heading">
+
+                <span>
+                  DETECTED CIRCUIT STRUCTURE
+                </span>
+
+                <span class="coming-soon">
+                  AI ANALYSIS
+                </span>
+
+              </div>
+
+
+              <pre id="netlist-output">Upload a circuit and press Analyze circuit.</pre>
+
+            </div>
+
+          </div>
+
+
+          <!-- =================================================
+               GRAPH VIEW
+          ================================================== -->
+
+          <div
+            class="result-view"
+            id="view-graphs"
+          >
+
+            <div class="graph-placeholder">
+
+              <div class="graph-icon">
+                📈
+              </div>
+
+
+              <h4>
+                Electrical graphs
+              </h4>
+
+
+              <p>
+                Circuit recognition is available now.
+                Real voltage, current, power and frequency
+                graphs will be generated after the SPICE
+                simulation engine is connected.
+              </p>
+
+
+              <p class="muted">
+                CKTSage will not fabricate electrical values.
+              </p>
+
+
+              <div class="future-graph-types">
+
+                <span>
+                  Voltage
+                </span>
+
+                <span>
+                  Current
+                </span>
+
+                <span>
+                  Power
+                </span>
+
+                <span>
+                  Frequency
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- =================================================
+               TABLE VIEW
+          ================================================== -->
+
+          <div
+            class="result-view"
+            id="view-table"
+          >
+
+            <div class="table-wrapper">
+
+              <table>
+
+                <thead>
+
+                  <tr>
+
+                    <th>
+                      ID
+                    </th>
+
+                    <th>
+                      Type
+                    </th>
+
+                    <th>
+                      Value
+                    </th>
+
+                    <th>
+                      Connected nodes
+                    </th>
+
+                    <th>
+                      Confidence
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+
+                <tbody
+                  id="component-table-body"
+                >
+
+                  <tr>
+
+                    <td
+                      colspan="5"
+                      class="empty-cell"
+                    >
+                      Analyze a circuit to see its components.
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+
+            <p class="pending-note">
+              Voltage, current and power columns can be added
+              here after the real SPICE engine is connected.
+            </p>
+
+          </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <div class="simulation-footer-note">
+          CKTSage Circuit Analyzer · AI circuit recognition + engineering analysis
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- =====================================================
+       PROFILE STATE
+  ====================================================== -->
+
+  <script>
+
+    (() => {
+
+      const AUTH_KEY =
+        "cktsage-auth";
+
+
+      const profileLink =
+        document.getElementById(
+          "user-profile-link"
+        );
+
+
+      const profileName =
+        document.getElementById(
+          "user-profile-name"
+        );
+
+
+      const profileIcon =
+        document.getElementById(
+          "user-profile-icon"
+        );
+
+
+      const sidebarName =
+        document.getElementById(
+          "sidebar-user-name"
+        );
+
+
+      let auth =
+        null;
+
+
+      try {
+
+        auth =
+          JSON.parse(
+            localStorage.getItem(
+              AUTH_KEY
+            ) || "null"
+          );
+
+      } catch (error) {
+
+        console.error(
+          "Could not read CKTSage login:",
+          error
+        );
+
+        auth =
+          null;
+      }
+
+
+      if (
+        auth &&
+        auth.access_token
+      ) {
+
+        const name =
+          auth.user?.name ||
+          "Account";
+
+
+        if (profileLink) {
+
+          profileLink.href =
+            "profile.html";
+        }
+
+
+        if (profileName) {
+
+          profileName.textContent =
+            name;
+        }
+
+
+        if (profileIcon) {
+
+          profileIcon.hidden =
+            false;
+        }
+
+
+        if (sidebarName) {
+
+          sidebarName.textContent =
+            name;
+        }
+
+
+      } else {
+
+        if (profileLink) {
+
+          profileLink.href =
+            "login.html";
+        }
+
+
+        if (profileName) {
+
+          profileName.textContent =
+            "Sign in";
+        }
+
+
+        if (profileIcon) {
+
+          profileIcon.hidden =
+            true;
+        }
+
+
+        if (sidebarName) {
+
+          sidebarName.textContent =
+            "Guest";
+        }
+
+      }
+
+    })();
+
+  </script>
+
+
+  <!-- =====================================================
+       CKTSAGE BACKEND CONFIG
+       web.js MUST load before simulation.js
+  ====================================================== -->
+
+  <script src="web.js?v=2"></script>
+
+
+  <!-- =====================================================
+       CIRCUIT ANALYZER LOGIC
+  ====================================================== -->
+<script src="web.js?v=2"></script>
+<script src="simulation.js?v=7"></script>
+
+</body>
+
+</html>

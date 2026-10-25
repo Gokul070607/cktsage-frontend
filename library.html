@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="theme-color"
+    content="#080808"
+  >
+
+  <title>Libraries — cktsage</title>
+
+  <link
+    rel="stylesheet"
+    href="chat.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="library.css?v=7"
+  >
+</head>
+
+
+<body class="library-page">
+
+  <div class="library-shell">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="library-sidebar">
+
+      <a
+        class="library-brand"
+        href="index.html"
+      >
+        <span class="brand-mark">ϟ</span>
+        <span>cktsage</span>
+      </a>
+
+
+      <a
+        class="library-side-link"
+        href="chat.html"
+      >
+        ✦ Chat
+      </a>
+
+
+      <a
+        class="library-side-link active"
+        href="library.html"
+      >
+        ▤ Libraries
+      </a>
+
+
+      <a
+        class="library-side-link"
+        href="simulation.html"
+      >
+        ⚡ Analyze
+      </a>
+
+
+      <a
+        class="library-side-link"
+        href="profile.html"
+      >
+        ◉ Account
+      </a>
+
+
+      <div class="library-sidebar-bottom">
+
+        <span class="brand-mark">
+          ϟ
+        </span>
+
+        <div>
+
+          <span id="sidebar-user-name">
+            User
+          </span>
+
+          <small>
+            Electronics assistant
+          </small>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="library-main">
+
+
+      <!-- ===================================================
+           TOPBAR
+      ==================================================== -->
+
+      <header class="library-topbar">
+
+        <a
+          href="chat.html"
+          class="back-mobile"
+        >
+          ← Chat
+        </a>
+
+
+        <span class="library-topbar-label">
+          LIBRARIES
+        </span>
+
+
+        <a
+          class="account-link user-profile-link"
+          id="user-profile-link"
+          href="profile.html"
+        >
+
+          <span
+            class="user-profile-icon"
+            id="user-profile-icon"
+          >
+            ◉
+          </span>
+
+          <span id="user-profile-name">
+            Account
+          </span>
+
+        </a>
+
+      </header>
+
+
+      <!-- ===================================================
+           CONTENT
+      ==================================================== -->
+
+      <section class="library-content">
+
+
+        <div class="library-eyebrow">
+          YOUR KNOWLEDGE SPACE
+        </div>
+
+
+        <div class="library-title-row">
+
+          <div>
+
+            <h1>
+              Libraries
+            </h1>
+
+            <p>
+              Save notes, links and uploaded documents
+              so they can be used inside your cktsage chats.
+            </p>
+
+          </div>
+
+
+          <button
+            id="add-resource-toggle"
+            class="primary-btn"
+            type="button"
+          >
+            ＋ Add resource
+          </button>
+
+        </div>
+
+
+        <div
+          id="library-status"
+          class="library-status"
+          role="status"
+          aria-live="polite"
+        ></div>
+
+
+        <!-- =================================================
+             ADD RESOURCE
+        ================================================== -->
+
+        <section
+          id="add-resource-panel"
+          class="add-resource-panel"
+          hidden
+        >
+
+          <div class="panel-heading">
+
+            <div>
+
+              <h2>
+                Add a resource
+              </h2>
+
+              <p>
+                Add a note, web reference,
+                image, or upload a real document.
+              </p>
+
+            </div>
+
+
+            <button
+              id="cancel-add"
+              class="icon-btn"
+              type="button"
+              aria-label="Close"
+            >
+              ×
+            </button>
+
+          </div>
+
+
+          <form id="resource-form">
+
+
+            <label for="resource-title">
+              Title
+            </label>
+
+            <input
+              id="resource-title"
+              type="text"
+              maxlength="160"
+              placeholder="e.g. Diode notes"
+              required
+            >
+
+
+            <label for="resource-type">
+              Resource type
+            </label>
+
+            <select id="resource-type">
+
+              <option value="note">
+                Note
+              </option>
+
+              <option value="link">
+                Web link
+              </option>
+
+              <option value="file">
+                Upload file / image
+              </option>
+
+            </select>
+
+
+            <div
+              id="resource-url-wrap"
+              hidden
+            >
+
+              <label for="resource-url">
+                Web link
+              </label>
+
+              <input
+                id="resource-url"
+                type="url"
+                placeholder="https://example.com"
+              >
+
+            </div>
+
+
+            <div
+              id="resource-file-wrap"
+              hidden
+            >
+
+              <label for="resource-file">
+                Choose file or image
+              </label>
+
+              <input
+                id="resource-file"
+                type="file"
+                accept="image/*,.pdf,.txt,.md,.doc,.docx,.csv,.xlsx,.ppt,.pptx,.json"
+              >
+
+              <div
+                id="selected-file-name"
+                class="selected-file-name"
+              >
+                No file selected
+              </div>
+
+            </div>
+
+
+            <label for="resource-description">
+              Notes / description
+            </label>
+
+            <textarea
+              id="resource-description"
+              rows="5"
+              placeholder="Add a short description or notes…"
+            ></textarea>
+
+
+            <button
+              class="primary-btn"
+              id="save-resource"
+              type="submit"
+            >
+              Save to library
+            </button>
+
+          </form>
+
+        </section>
+
+
+        <!-- =================================================
+             TOOLBAR
+        ================================================== -->
+
+        <div class="library-toolbar">
+
+          <div class="library-search-wrap">
+
+            <span>
+              ⌕
+            </span>
+
+            <input
+              id="library-search"
+              type="search"
+              placeholder="Search your library…"
+              aria-label="Search your library"
+            >
+
+          </div>
+
+
+          <span
+            id="resource-count"
+            class="resource-count"
+          >
+            0 resources
+          </span>
+
+        </div>
+
+
+        <!-- =================================================
+             LIBRARY GRID
+        ================================================== -->
+
+        <div
+          id="library-grid"
+          class="library-grid"
+        >
+
+          <div class="library-loading">
+            Loading your library…
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- =====================================================
+       PROFILE STATE
+  ====================================================== -->
+
+  <script>
+
+    (() => {
+
+      const AUTH_KEY =
+        "cktsage-auth";
+
+
+      const profileLink =
+        document.getElementById(
+          "user-profile-link"
+        );
+
+
+      const profileName =
+        document.getElementById(
+          "user-profile-name"
+        );
+
+
+      const profileIcon =
+        document.getElementById(
+          "user-profile-icon"
+        );
+
+
+      const sidebarName =
+        document.getElementById(
+          "sidebar-user-name"
+        );
+
+
+      let auth =
+        null;
+
+
+      try {
+
+        auth =
+          JSON.parse(
+            localStorage.getItem(
+              AUTH_KEY
+            ) || "null"
+          );
+
+      } catch (error) {
+
+        auth =
+          null;
+      }
+
+
+      if (
+        auth &&
+        auth.access_token
+      ) {
+
+        const name =
+          auth.user?.name?.trim() ||
+          "Account";
+
+
+        profileLink.href =
+          "profile.html";
+
+
+        profileName.textContent =
+          name;
+
+
+        profileIcon.hidden =
+          false;
+
+
+        if (
+          sidebarName
+        ) {
+
+          sidebarName.textContent =
+            name;
+        }
+
+
+      } else {
+
+        profileLink.href =
+          "login.html";
+
+
+        profileName.textContent =
+          "Sign in";
+
+
+        profileIcon.hidden =
+          true;
+
+
+        if (
+          sidebarName
+        ) {
+
+          sidebarName.textContent =
+            "Guest";
+        }
+
+      }
+
+    })();
+
+  </script>
+
+
+  <!-- =====================================================
+       BACKEND CONFIG
+       MUST LOAD BEFORE LIBRARY.JS
+  ====================================================== -->
+
+  <script src="web.js?v=2"></script>
+
+
+  <!-- =====================================================
+       LIBRARY LOGIC
+  ====================================================== -->
+
+  <script src="library.js?v=10"></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="theme-color"
+    content="#080808"
+  >
+
+  <title>cktsage — Chat</title>
+
+  <link
+    rel="stylesheet"
+    href="chat.css?v=8"
+  >
+
+  <!-- =====================================================
+       MATHJAX CONFIG
+  ====================================================== -->
+
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [
+          ["$", "$"],
+          ["\\(", "\\)"]
+        ],
+
+        displayMath: [
+          ["$$", "$$"],
+          ["\\[", "\\]"]
+        ],
+
+        processEscapes: true
+      },
+
+      options: {
+        skipHtmlTags: [
+          "script",
+          "noscript",
+          "style",
+          "textarea",
+          "pre",
+          "code"
+        ]
+      },
+
+      svg: {
+        fontCache: "global"
+      }
+    };
+  </script>
+
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+  ></script>
+
+</head>
+
+
+<body>
+
+  <div
+    class="chat-shell"
+    id="chat-shell"
+  >
+
+    <aside
+      class="sidebar"
+      id="sidebar"
+    >
+
+      <a
+        class="brand"
+        href="index.html"
+        aria-label="Go to cktsage home"
+        title="Go to home"
+        style="
+          text-decoration: none;
+          color: inherit;
+          cursor: pointer;
+        "
+      >
+
+        <span class="brand-mark">
+          ϟ
+        </span>
+
+        <span>
+          cktsage
+        </span>
+
+      </a>
+
+
+      <button
+        class="new-chat"
+        id="new-chat"
+        type="button"
+      >
+        ＋ New chat
+      </button>
+
+
+      <a
+        class="sidebar-nav-link"
+        href="library.html"
+      >
+
+        <span class="sidebar-nav-icon">
+          ▤
+        </span>
+
+        <span>
+          Libraries
+        </span>
+
+        <span class="sidebar-nav-arrow">
+          ↗
+        </span>
+
+      </a>
+
+
+      <a
+        class="sidebar-nav-link"
+        href="simulation.html"
+      >
+
+        <span class="sidebar-nav-icon">
+          ⚡
+        </span>
+
+        <span>
+          Analyze
+        </span>
+
+        <span class="sidebar-nav-arrow">
+          ↗
+        </span>
+
+      </a>
+
+
+      <a
+        class="sidebar-nav-link"
+        href="profile.html"
+      >
+
+        <span class="sidebar-nav-icon">
+          ◉
+        </span>
+
+        <span>
+          Account
+        </span>
+
+        <span class="sidebar-nav-arrow">
+          ↗
+        </span>
+
+      </a>
+
+
+      <div class="recent-heading">
+        RECENTS
+      </div>
+
+
+      <div
+        id="recent-list"
+        class="recent-list"
+      >
+
+        <p class="recent-empty">
+          Your recent questions will appear here.
+        </p>
+
+      </div>
+
+
+      <div class="sidebar-bottom">
+
+        <span class="brand-mark">
+          ϟ
+        </span>
+
+        <span id="sidebar-user-name">
+          User
+        </span>
+
+        <small>
+          Electronics assistant
+        </small>
+
+      </div>
+
+    </aside>
+
+
+    <main class="main">
+
+      <header class="topbar">
+
+        <button
+          class="mobile-toggle"
+          id="mobile-toggle"
+          type="button"
+          aria-label="Toggle sidebar"
+          aria-expanded="true"
+          title="Toggle sidebar"
+        >
+          ☰
+        </button>
+
+
+        <span class="mode">
+          ELECTRONICS ASSISTANT
+        </span>
+
+
+        <a
+          class="account-link user-profile-link"
+          id="user-profile-link"
+          href="profile.html"
+        >
+
+          <span
+            class="user-profile-icon"
+            id="user-profile-icon"
+          >
+            ◉
+          </span>
+
+          <span id="user-profile-name">
+            Account
+          </span>
+
+        </a>
+
+      </header>
+
+
+      <button
+        class="sidebar-scrim"
+        id="sidebar-scrim"
+        type="button"
+        aria-label="Close sidebar"
+      ></button>
+
+
+      <div
+        class="attached-library"
+        id="attached-library"
+        hidden
+      ></div>
+
+
+      <section
+        class="thread"
+        id="thread"
+        aria-live="polite"
+      >
+
+        <div
+          class="welcome"
+          id="welcome"
+        >
+
+          <span class="welcome-spark">
+            ϟ
+          </span>
+
+          <h1>
+            What are we building today?
+          </h1>
+
+          <p>
+            Ask about circuits, components,
+            calculations, or troubleshooting.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <form
+        class="composer"
+        id="composer"
+      >
+
+        <textarea
+          id="prompt"
+          rows="1"
+          placeholder="Message cktsage…"
+          aria-label="Message cktsage"
+        ></textarea>
+
+
+        <button
+          class="library-attach"
+          id="library-attach"
+          type="button"
+          aria-label="Add from Library"
+          title="Add from Library"
+        >
+          ＋
+        </button>
+
+
+        <button
+          class="send"
+          id="send"
+          type="submit"
+          aria-label="Send message"
+          title="Send"
+        >
+          ↑
+        </button>
+
+
+        <div class="composer-note">
+          Enter to send · Shift + Enter for new line
+        </div>
+
+      </form>
+
+    </main>
+
+  </div>
+
+
+  <!-- =====================================================
+       LOGGED-IN PROFILE STATE
+  ====================================================== -->
+
+  <script>
+
+    (() => {
+
+      const AUTH_KEY =
+        "cktsage-auth";
+
+
+      const profileLink =
+        document.getElementById(
+          "user-profile-link"
+        );
+
+
+      const profileName =
+        document.getElementById(
+          "user-profile-name"
+        );
+
+
+      const profileIcon =
+        document.getElementById(
+          "user-profile-icon"
+        );
+
+
+      const sidebarName =
+        document.getElementById(
+          "sidebar-user-name"
+        );
+
+
+      let auth =
+        null;
+
+
+      try {
+
+        auth =
+          JSON.parse(
+            localStorage.getItem(
+              AUTH_KEY
+            ) || "null"
+          );
+
+      } catch (error) {
+
+        auth =
+          null;
+      }
+
+
+      if (
+        auth &&
+        auth.access_token
+      ) {
+
+        const name =
+          auth.user?.name?.trim() ||
+          "Account";
+
+
+        profileLink.href =
+          "profile.html";
+
+
+        profileName.textContent =
+          name;
+
+
+        profileIcon.hidden =
+          false;
+
+
+        if (
+          sidebarName
+        ) {
+
+          sidebarName.textContent =
+            name;
+        }
+
+
+      } else {
+
+        profileLink.href =
+          "login.html";
+
+
+        profileName.textContent =
+          "Sign in";
+
+
+        profileIcon.hidden =
+          true;
+
+
+        if (
+          sidebarName
+        ) {
+
+          sidebarName.textContent =
+            "Guest";
+        }
+
+      }
+
+    })();
+
+  </script>
+
+
+  <!-- =====================================================
+       COMMON BACKEND CONFIG
+  ====================================================== -->
+
+  <script src="web.js?v=2"></script>
+
+
+  <!-- =====================================================
+       CHAT LOGIC
+  ====================================================== -->
+
+  <script src="chat.js?v=17"></script>
+
+
+</body>
+
+</html>

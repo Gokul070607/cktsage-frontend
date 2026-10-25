@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="theme-color"
+    content="#080808"
+  >
+
+  <title>CKTSage - Profile</title>
+
+  <link
+    rel="stylesheet"
+    href="chat.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="profile.css?v=5"
+  >
+</head>
+
+
+<body>
+
+  <div class="profile-layout">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="profile-sidebar">
+
+      <a
+        href="index.html"
+        class="profile-brand"
+      >
+        <span class="brand-icon">
+          ϟ
+        </span>
+
+        <span>
+          cktsage
+        </span>
+      </a>
+
+
+      <nav class="profile-nav">
+
+        <a href="chat.html">
+          ✦ Chat
+        </a>
+
+        <a href="library.html">
+          ▤ Libraries
+        </a>
+
+        <a href="simulation.html">
+          ⚡ Analyze
+        </a>
+
+      </nav>
+
+
+      <div class="sidebar-user">
+
+        <div class="sidebar-user-icon">
+          ◉
+        </div>
+
+        <div>
+
+          <strong id="sidebar-user-name">
+            User
+          </strong>
+
+          <span>
+            Signed in
+          </span>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="profile-main">
+
+
+      <!-- ===================================================
+           TOP BAR
+      ==================================================== -->
+
+      <header class="profile-topbar">
+
+        <div>
+          PROFILE
+        </div>
+
+        <a href="index.html">
+          Home ↗
+        </a>
+
+      </header>
+
+
+      <!-- ===================================================
+           CONTENT
+      ==================================================== -->
+
+      <section class="profile-content">
+
+
+        <!-- =================================================
+             HEADING
+        ================================================== -->
+
+        <div class="profile-heading">
+
+          <span>
+            CKTSAGE ACCOUNT
+          </span>
+
+          <h1>
+            Your profile.
+          </h1>
+
+          <p>
+            View your account information,
+            change your name or password,
+            or manually sign out.
+          </p>
+
+        </div>
+
+
+        <!-- =================================================
+             PROFILE DETAILS
+        ================================================== -->
+
+        <section class="profile-card">
+
+          <div class="profile-header">
+
+            <div class="profile-avatar">
+              ◉
+            </div>
+
+            <div>
+
+              <span>
+                PROFILE
+              </span>
+
+              <h2 id="profile-name">
+                Loading...
+              </h2>
+
+            </div>
+
+          </div>
+
+
+          <div class="profile-grid">
+
+            <div class="profile-info">
+
+              <span>
+                NAME
+              </span>
+
+              <strong id="profile-name-value">
+                —
+              </strong>
+
+            </div>
+
+
+            <div class="profile-info">
+
+              <span>
+                EMAIL
+              </span>
+
+              <strong id="profile-email">
+                —
+              </strong>
+
+            </div>
+
+
+            <div class="profile-info">
+
+              <span>
+                STATUS
+              </span>
+
+              <strong class="online">
+                ● Signed in
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <p
+            id="profile-message"
+            class="profile-message"
+            role="status"
+            aria-live="polite"
+          ></p>
+
+        </section>
+
+
+        <!-- =================================================
+             CHANGE NAME
+        ================================================== -->
+
+        <section class="profile-card">
+
+          <div class="section-title">
+
+            <span>
+              PROFILE
+            </span>
+
+            <h2>
+              Change name
+            </h2>
+
+          </div>
+
+
+          <form
+            id="name-form"
+            novalidate
+          >
+
+            <label for="new-name">
+              Display name
+            </label>
+
+
+            <input
+              type="text"
+              id="new-name"
+              name="new-name"
+              autocomplete="name"
+              placeholder="Enter your name"
+              minlength="2"
+              maxlength="80"
+              required
+            >
+
+
+            <button
+              type="submit"
+              id="change-name-button"
+              class="change-password-button"
+            >
+              Update name
+            </button>
+
+
+            <p
+              id="name-message"
+              class="password-message"
+              role="status"
+              aria-live="polite"
+            ></p>
+
+          </form>
+
+        </section>
+
+
+        <!-- =================================================
+             CHANGE PASSWORD
+        ================================================== -->
+
+        <section class="profile-card">
+
+          <div class="section-title">
+
+            <span>
+              SECURITY
+            </span>
+
+            <h2>
+              Change password
+            </h2>
+
+          </div>
+
+
+          <form
+            id="password-form"
+            novalidate
+          >
+
+            <label for="current-password">
+
+              Current password
+
+              <div class="password-box">
+
+                <input
+                  type="password"
+                  id="current-password"
+                  name="current-password"
+                  autocomplete="current-password"
+                  placeholder="Enter current password"
+                  minlength="6"
+                  required
+                >
+
+                <button
+                  type="button"
+                  class="password-toggle"
+                  data-target="current-password"
+                >
+                  Show
+                </button>
+
+              </div>
+
+            </label>
+
+
+            <label for="new-password">
+
+              New password
+
+              <div class="password-box">
+
+                <input
+                  type="password"
+                  id="new-password"
+                  name="new-password"
+                  autocomplete="new-password"
+                  placeholder="Enter new password"
+                  minlength="6"
+                  required
+                >
+
+                <button
+                  type="button"
+                  class="password-toggle"
+                  data-target="new-password"
+                >
+                  Show
+                </button>
+
+              </div>
+
+            </label>
+
+
+            <label for="confirm-password">
+
+              Confirm new password
+
+              <div class="password-box">
+
+                <input
+                  type="password"
+                  id="confirm-password"
+                  name="confirm-password"
+                  autocomplete="new-password"
+                  placeholder="Confirm new password"
+                  minlength="6"
+                  required
+                >
+
+                <button
+                  type="button"
+                  class="password-toggle"
+                  data-target="confirm-password"
+                >
+                  Show
+                </button>
+
+              </div>
+
+            </label>
+
+
+            <button
+              type="submit"
+              id="change-password-button"
+              class="change-password-button"
+            >
+              Update password
+            </button>
+
+
+            <p
+              id="password-message"
+              class="password-message"
+              role="status"
+              aria-live="polite"
+            ></p>
+
+          </form>
+
+        </section>
+
+
+        <!-- =================================================
+             SIGN OUT
+        ================================================== -->
+
+        <section class="profile-card danger-card">
+
+          <div class="section-title">
+
+            <span>
+              SESSION
+            </span>
+
+            <h2>
+              Sign out
+            </h2>
+
+          </div>
+
+
+          <p class="signout-text">
+            You will remain signed in until you manually
+            press the button below.
+          </p>
+
+
+          <button
+            type="button"
+            id="signout-button"
+            class="signout-button"
+          >
+            Sign out
+          </button>
+
+        </section>
+
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- =====================================================
+       IMPORTANT:
+       LOAD COMMON CONFIG BEFORE PROFILE.JS
+  ====================================================== -->
+
+  <script src="web.js?v=1"></script>
+  <script src="profile.js?v=5"></script>
+
+
+</body>
+
+</html>

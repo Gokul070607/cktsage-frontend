@@ -1,0 +1,1260 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="theme-color"
+    content="#05070d"
+  >
+
+  <title>
+    cktsage — Ideas into circuits
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  >
+
+</head>
+
+
+<body class="intro-loading">
+
+
+  <!-- =====================================================
+       LOGIN CHECK
+       No saved login -> login.html
+       Saved login -> stay on index.html
+  ====================================================== -->
+
+  <script>
+    (() => {
+
+      const AUTH_KEY =
+        "cktsage-auth";
+
+      let auth =
+        null;
+
+      try {
+
+        auth =
+          JSON.parse(
+            localStorage.getItem(
+              AUTH_KEY
+            ) || "null"
+          );
+
+      } catch (error) {
+
+        auth =
+          null;
+      }
+
+      if (
+        !auth ||
+        !auth.access_token
+      ) {
+
+        window.location.replace(
+          "login.html"
+        );
+
+      }
+
+    })();
+  </script>
+
+
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grain"></div>
+
+
+  <!-- =====================================================
+       INTRO
+  ====================================================== -->
+
+  <div
+    class="intro"
+    id="intro"
+    aria-label="CKTSage intro animation"
+  >
+
+    <div
+      class="intro-bulb"
+      id="intro-bulb"
+    >
+
+      <svg
+        viewBox="0 0 120 160"
+        role="img"
+        aria-label="Light bulb"
+      >
+
+        <defs>
+
+          <linearGradient
+            id="glass"
+            x1="0"
+            y1="0"
+            x2="1"
+            y2="1"
+          >
+
+            <stop
+              offset="0"
+              stop-color="#eaf4ff"
+            />
+
+            <stop
+              offset=".34"
+              stop-color="#8fbaff"
+            />
+
+            <stop
+              offset="1"
+              stop-color="#3264b9"
+            />
+
+          </linearGradient>
+
+
+          <linearGradient
+            id="base"
+            x1="0"
+            y1="0"
+            x2="1"
+            y2="0"
+          >
+
+            <stop
+              offset="0"
+              stop-color="#4a5c7b"
+            />
+
+            <stop
+              offset=".5"
+              stop-color="#d8e6ff"
+            />
+
+            <stop
+              offset="1"
+              stop-color="#4c6287"
+            />
+
+          </linearGradient>
+
+
+          <filter
+            id="bulbGlow"
+            x="-150%"
+            y="-150%"
+            width="400%"
+            height="400%"
+          >
+
+            <feGaussianBlur
+              stdDeviation="9"
+            />
+
+          </filter>
+
+        </defs>
+
+
+        <ellipse
+          class="bulb-halo"
+          cx="60"
+          cy="65"
+          rx="37"
+          ry="42"
+          fill="#4d8fff"
+          opacity=".7"
+          filter="url(#bulbGlow)"
+        />
+
+
+        <path
+          class="bulb-glass"
+          d="M60 10C35 10 18 29 18 53c0 18 10 29 22 42 5 5 7 10 7 17h26c0-7 2-12 7-17 12-13 22-24 22-42C102 29 85 10 60 10Z"
+          fill="url(#glass)"
+          stroke="#c6dcff"
+          stroke-width="2"
+        />
+
+
+        <path
+          class="bulb-reflection"
+          d="M34 36c5-11 13-16 21-17"
+          fill="none"
+          stroke="#fff"
+          stroke-width="4"
+          stroke-linecap="round"
+          opacity=".8"
+        />
+
+
+        <path
+          class="bulb-filament"
+          d="M47 74v-8l9-7 8 7v8m-8-15v-8m-10 27h20"
+          fill="none"
+          stroke="#e8f4ff"
+          stroke-width="2.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+
+
+        <path
+          d="M47 111h26v7H47zm2 8h22v6H49zm3 7h16v5H52z"
+          fill="url(#base)"
+          stroke="#9fb9df"
+          stroke-width="1"
+        />
+
+
+        <path
+          d="M53 132v7m14-7v7m-14 0h14"
+          stroke="#8095b5"
+          stroke-width="2"
+          stroke-linecap="round"
+        />
+
+      </svg>
+
+
+      <div class="bulb-floor-glow"></div>
+
+    </div>
+
+
+    <p
+      class="intro-label"
+      id="intro-label"
+    >
+      A little spark changes everything.
+    </p>
+
+
+    <button
+      class="skip-intro"
+      id="skip-intro"
+      type="button"
+    >
+
+      Skip intro
+
+      <span>↗</span>
+
+    </button>
+
+  </div>
+
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <header class="site-header reveal">
+
+
+    <a
+      class="brand"
+      href="index.html"
+      aria-label="cktsage home"
+    >
+
+      <span class="brand-mark">
+        ϟ
+      </span>
+
+      cktsage
+
+    </a>
+
+
+    <nav>
+
+      <a href="#circuit-lab">
+        Workbench
+      </a>
+
+      <a href="chat.html">
+        Chat
+      </a>
+
+      <a href="#features">
+        Explore
+      </a>
+
+      <a href="#about">
+        About
+      </a>
+
+    </nav>
+
+
+    <div class="header-actions">
+
+
+      <!-- LOGGED-IN PROFILE -->
+
+      <a
+        class="login-link user-profile-link"
+        id="user-profile-link"
+        href="profile.html"
+      >
+
+        <span
+          class="user-profile-icon"
+          id="user-profile-icon"
+        >
+          ◉
+        </span>
+
+        <span id="user-profile-name">
+          Account
+        </span>
+
+      </a>
+
+
+      <a
+        class="header-cta"
+        href="#ask"
+      >
+
+        Start exploring
+
+        <span>↗</span>
+
+      </a>
+
+
+    </div>
+
+  </header>
+
+
+  <!-- =====================================================
+       MAIN
+  ====================================================== -->
+
+  <main>
+
+
+    <!-- HERO -->
+
+    <section
+      class="hero reveal"
+      id="about"
+    >
+
+      <div class="hero-copy">
+
+
+        <div class="eyebrow">
+
+          <span class="eyebrow-line"></span>
+
+          YOUR ELECTRONICS WORKBENCH
+
+        </div>
+
+
+        <h1>
+
+          Every great idea
+
+          <br>
+
+          starts with
+
+          <span>
+            a spark.
+          </span>
+
+        </h1>
+
+
+        <p class="hero-description">
+
+          Make sense of circuits,
+          understand components,
+          and bring your next electronics
+          idea to life — one clear step at a time.
+
+        </p>
+
+
+        <div class="hero-actions">
+
+          <a
+            class="primary-button"
+            href="#ask"
+          >
+
+            Explore CKTSage
+
+            <span>↗</span>
+
+          </a>
+
+
+          <a
+            class="text-button"
+            href="#circuit-lab"
+          >
+
+            See the workbench
+
+            <span>↓</span>
+
+          </a>
+
+        </div>
+
+
+        <div class="hero-note">
+
+          <span class="pulse-dot"></span>
+
+          For students, makers,
+          and curious minds
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="hero-art"
+        aria-label="Decorative floating electronic components"
+      >
+
+        <div class="art-orbit orbit-large"></div>
+        <div class="art-orbit orbit-small"></div>
+
+
+        <div
+          class="breadboard-3d"
+          aria-hidden="true"
+        >
+
+          <div class="board-rail rail-positive"></div>
+
+          <div class="board-rail rail-negative"></div>
+
+          <div class="board-rail rail-positive rail-bottom-positive"></div>
+
+          <div class="board-rail rail-negative rail-bottom-negative"></div>
+
+
+          <div class="board-holes holes-top"></div>
+
+          <div class="board-holes holes-bottom"></div>
+
+
+          <div class="board-groove"></div>
+
+
+          <svg
+            class="breadboard-wiring"
+            viewBox="0 0 244 170"
+            aria-hidden="true"
+          >
+
+            <path
+              class="wire-red"
+              d="M43 66 V57 H70 V73 H81"
+            />
+
+            <path
+              class="wire-metal"
+              d="M119 73 H133 V65 H145"
+            />
+
+            <path
+              class="wire-blue"
+              d="M153 65 V88 H69 V83 H43"
+            />
+
+          </svg>
+
+
+          <div
+            class="mini-battery"
+            aria-label="Battery"
+          >
+
+            <span>+</span>
+
+            <i></i>
+
+            <b>−</b>
+
+          </div>
+
+
+          <div class="mini-resistor">
+
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+
+          </div>
+
+
+          <div class="mini-led">
+
+            <i></i>
+
+          </div>
+
+        </div>
+
+
+        <div class="art-trace trace-one"></div>
+        <div class="art-trace trace-two"></div>
+        <div class="art-trace trace-three"></div>
+
+
+        <div
+          class="floating-part part-resistor"
+          aria-hidden="true"
+        >
+
+          <span class="lead"></span>
+
+          <span class="res-body">
+
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+
+          </span>
+
+          <span class="lead"></span>
+
+        </div>
+
+
+        <div
+          class="floating-part part-cap"
+          aria-hidden="true"
+        >
+
+          <span class="cap-top"></span>
+
+          <span class="cap-can">
+
+            220
+
+            <span>µF</span>
+
+          </span>
+
+          <span class="cap-pin"></span>
+
+        </div>
+
+
+        <div
+          class="floating-part part-chip"
+          aria-hidden="true"
+        >
+
+          <span>IC</span>
+
+          <i></i>
+          <i></i>
+          <i></i>
+          <i></i>
+
+        </div>
+
+
+        <div class="art-caption">
+
+          <span class="caption-dot"></span>
+
+          THINK · BUILD · DISCOVER
+
+        </div>
+
+
+        <div class="glass-float-label">
+
+          <span class="caption-dot"></span>
+
+          BREADBOARD LAB
+
+          <b>LIVE</b>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         ASK
+    ==================================================== -->
+
+    <section
+      class="ask-section reveal"
+      id="ask"
+    >
+
+      <div class="section-glint"></div>
+
+
+      <div class="ask-heading">
+
+        <div>
+
+          <div class="eyebrow">
+            START WITH A QUESTION
+          </div>
+
+          <h2>
+            What are you curious about?
+          </h2>
+
+        </div>
+
+
+        <p>
+          Describe a circuit,
+          a component,
+          or a problem you want to solve.
+        </p>
+
+      </div>
+
+
+      <form
+        class="ask-box"
+        id="ask-form"
+      >
+
+        <span class="ask-icon">
+          ϟ
+        </span>
+
+
+        <input
+          id="ask-input"
+          type="text"
+          placeholder="Ask about an LED, resistor, circuit fault…"
+          aria-label="Your electronics question"
+        >
+
+
+        <button type="submit">
+
+          Ask CKTSage
+
+          <span>↗</span>
+
+        </button>
+
+      </form>
+
+
+      <div class="suggestions">
+
+        <button
+          type="button"
+          data-question="Why is my LED not lighting up?"
+        >
+          LED not lighting up
+        </button>
+
+
+        <button
+          type="button"
+          data-question="Help me calculate a resistor value for an LED."
+        >
+          Calculate a resistor
+        </button>
+
+
+        <button
+          type="button"
+          data-question="Explain this circuit step by step."
+        >
+          Explain a circuit
+        </button>
+
+
+        <button
+          type="button"
+          data-question="Help me understand a transistor datasheet."
+        >
+          Read a datasheet
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         WORKBENCH
+    ==================================================== -->
+
+    <section
+      class="workbench reveal"
+      id="workbench"
+    >
+
+      <div class="section-heading">
+
+        <div>
+
+          <div class="eyebrow">
+            THE WORKBENCH
+          </div>
+
+          <h2>
+            From first spark to working circuit.
+          </h2>
+
+        </div>
+
+
+        <p>
+          Small steps.
+          Clear explanations.
+          Better builds.
+        </p>
+
+      </div>
+
+
+      <div
+        class="bento-grid"
+        id="features"
+      >
+
+        <a
+          class="feature feature-main"
+          href="#ask"
+        >
+
+          <span class="feature-number">
+            01 / UNDERSTAND
+          </span>
+
+
+          <div
+            class="schematic"
+            aria-hidden="true"
+          >
+
+            <span class="schem-line line-a"></span>
+            <span class="schem-line line-b"></span>
+            <span class="schem-resistor"></span>
+            <span class="schem-node"></span>
+            <span class="schem-led"></span>
+
+          </div>
+
+
+          <h3>
+            Make sense of your circuit.
+          </h3>
+
+
+          <p>
+            Follow signal flow,
+            component roles,
+            and the reasons a circuit
+            behaves the way it does.
+          </p>
+
+
+          <span class="feature-link">
+            Explore circuits ↗
+          </span>
+
+        </a>
+
+
+        <a
+          class="feature feature-calc"
+          href="#ask"
+        >
+
+          <span class="feature-number">
+            02 / CALCULATE
+          </span>
+
+
+          <div class="formula-art">
+
+            <small>
+              OHM’S LAW
+            </small>
+
+            <b>
+              V = I × R
+            </b>
+
+            <span>
+              Voltage · Current · Resistance
+            </span>
+
+          </div>
+
+
+          <h3>
+            Get the numbers right.
+          </h3>
+
+
+          <p>
+            Work through current,
+            voltage drops,
+            and component values.
+          </p>
+
+
+          <span class="feature-link">
+            Try a calculation ↗
+          </span>
+
+        </a>
+
+
+        <a
+          class="feature feature-data"
+          href="#ask"
+        >
+
+          <span class="feature-number">
+            03 / EXPLORE
+          </span>
+
+
+          <div class="data-art">
+
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+
+          </div>
+
+
+          <h3>
+            Decode the datasheet.
+          </h3>
+
+
+          <p>
+            Find meaning in pinouts,
+            ratings,
+            and electrical limits.
+          </p>
+
+
+          <span class="feature-link">
+            Explore components ↗
+          </span>
+
+        </a>
+
+
+        <div class="feature feature-quote">
+
+          <span class="quote-star">
+            ✳
+          </span>
+
+
+          <p>
+            “Curiosity is the first component
+            in every great build.”
+          </p>
+
+
+          <small>
+            KEEP EXPERIMENTING · KEEP LEARNING
+          </small>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         CIRCUIT LAB
+    ==================================================== -->
+
+    <section
+      class="circuit-lab reveal"
+      id="circuit-lab"
+    >
+
+      <div class="section-heading">
+
+        <div>
+
+          <div class="eyebrow">
+            INTERACTIVE CIRCUIT LAB
+          </div>
+
+          <h2>
+            Build it. Wire it. Test it.
+          </h2>
+
+        </div>
+
+
+        <p>
+          Drag components,
+          connect terminals with wires,
+          then run a simple DC simulation.
+        </p>
+
+      </div>
+
+
+      <div class="lab-shell">
+
+
+        <div class="lab-toolbar">
+
+
+          <div class="lab-parts">
+
+            <button
+              type="button"
+              data-add-part="battery"
+            >
+              ＋ Battery
+            </button>
+
+
+            <button
+              type="button"
+              data-add-part="resistor"
+            >
+              ＋ Resistor
+            </button>
+
+
+            <button
+              type="button"
+              data-add-part="led"
+            >
+              ＋ LED
+            </button>
+
+
+            <button
+              type="button"
+              data-add-part="switch"
+            >
+              ＋ Switch
+            </button>
+
+
+            <button
+              type="button"
+              data-add-part="ground"
+            >
+              ＋ Ground
+            </button>
+
+          </div>
+
+
+          <div class="lab-actions">
+
+            <button
+              type="button"
+              id="wire-mode"
+            >
+              Wire: click 2 terminals
+            </button>
+
+
+            <button
+              type="button"
+              id="delete-selected"
+            >
+              Delete selected
+            </button>
+
+
+            <button
+              type="button"
+              id="clear-lab"
+            >
+              Clear
+            </button>
+
+
+            <button
+              type="button"
+              id="simulate-lab"
+              class="simulate-button"
+            >
+              ▶ Simulate
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="circuit-board"
+          id="circuit-board"
+          aria-label="Interactive circuit building board"
+        >
+
+          <svg
+            class="wire-layer"
+            id="wire-layer"
+            aria-label="Circuit wires"
+          ></svg>
+
+
+          <div
+            class="board-hint"
+            id="board-hint"
+          >
+
+            Add components,
+            then connect terminal dots.
+            Drag parts to reposition them.
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="lab-readout"
+          aria-live="polite"
+        >
+
+          <div>
+
+            <span class="readout-label">
+              SIMULATION
+            </span>
+
+            <strong id="sim-status">
+              Not running
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span class="readout-label">
+              SUPPLY
+            </span>
+
+            <strong id="sim-voltage">
+              — V
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span class="readout-label">
+              CURRENT
+            </span>
+
+            <strong id="sim-current">
+              — mA
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span class="readout-label">
+              POWER
+            </span>
+
+            <strong id="sim-power">
+              — mW
+            </strong>
+
+          </div>
+
+
+          <p id="sim-explanation">
+
+            Educational DC approximation:
+            ideal wires,
+            a fixed LED drop,
+            and a simple series-path check.
+            Not a hardware-grade simulator.
+
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+
+  <!-- =====================================================
+       FOOTER
+  ====================================================== -->
+
+  <footer class="reveal">
+
+    <a
+      class="brand"
+      href="index.html"
+    >
+
+      <span class="brand-mark">
+        ϟ
+      </span>
+
+      CKTSage
+
+    </a>
+
+
+    <span>
+      Built for the next idea.
+    </span>
+
+
+    <a href="#ask">
+      Back to the spark ↑
+    </a>
+
+  </footer>
+
+
+  <!-- =====================================================
+       LOGGED-IN PROFILE NAME
+  ====================================================== -->
+
+  <script>
+
+    (() => {
+
+      const AUTH_KEY =
+        "cktsage-auth";
+
+
+      const profileLink =
+        document.getElementById(
+          "user-profile-link"
+        );
+
+
+      const profileName =
+        document.getElementById(
+          "user-profile-name"
+        );
+
+
+      const profileIcon =
+        document.getElementById(
+          "user-profile-icon"
+        );
+
+
+      let auth =
+        null;
+
+
+      try {
+
+        auth =
+          JSON.parse(
+            localStorage.getItem(
+              AUTH_KEY
+            ) || "null"
+          );
+
+      } catch (error) {
+
+        auth =
+          null;
+      }
+
+
+      if (
+        auth &&
+        auth.access_token
+      ) {
+
+        profileLink.href =
+          "profile.html";
+
+
+        profileName.textContent =
+          auth.user?.name?.trim() ||
+          "Account";
+
+
+        profileIcon.hidden =
+          false;
+
+
+      } else {
+
+        profileLink.href =
+          "login.html";
+
+
+        profileName.textContent =
+          "Sign in";
+
+
+        profileIcon.hidden =
+          true;
+      }
+
+    })();
+
+  </script>
+
+
+  <!-- EXISTING HOMEPAGE LOGIC -->
+
+  <script src="script.js?v=3"></script>
+
+
+</body>
+
+</html>
