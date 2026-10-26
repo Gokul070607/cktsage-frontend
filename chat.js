@@ -1,4 +1,3 @@
-
 (() => {
   "use strict";
 
@@ -10,16 +9,29 @@
     !window.CKTSAGE_CONFIG ||
     !window.CKTSAGE_CONFIG.API_BASE
   ) {
-    console.error("CKTSage backend configuration is missing.");
-    alert("CKTSage configuration could not be loaded.");
+    console.error(
+      "CKTSage backend configuration is missing."
+    );
+
+    alert(
+      "CKTSage configuration could not be loaded."
+    );
+
     return;
   }
 
-  const API_BASE = window.CKTSAGE_CONFIG.API_BASE;
+  const API_BASE =
+    window.CKTSAGE_CONFIG.API_BASE;
 
-  const AUTH_KEY = "cktsage-auth";
-  const ACTIVE_CHAT_KEY = "cktsage-active-conversation";
-  const PENDING_PROMPT_KEY = "cktsage-pending-prompt";
+  const AUTH_KEY =
+    "cktsage-auth";
+
+  const ACTIVE_CHAT_KEY =
+    "cktsage-active-conversation";
+
+  const PENDING_PROMPT_KEY =
+    "cktsage-pending-prompt";
+
 
   // =====================================================
   // AUTH
@@ -28,104 +40,207 @@
   let auth = null;
 
   try {
-    auth = JSON.parse(
-      localStorage.getItem(AUTH_KEY) || "null"
-    );
+    auth =
+      JSON.parse(
+        localStorage.getItem(
+          AUTH_KEY
+        ) || "null"
+      );
   } catch (error) {
-    console.error("Could not read saved login:", error);
+    console.error(
+      "Could not read saved login:",
+      error
+    );
+
     auth = null;
   }
 
-  // Only redirect when there is no saved authentication.
-  // We do NOT automatically delete the saved login because
-  // CKTSage uses persistent authentication.
-  if (!auth || !auth.access_token) {
-    window.location.replace("login.html");
+
+  // =====================================================
+  // CHAT IS A PROTECTED PAGE
+  //
+  // Homepage is public.
+  // Chat requires a saved login.
+  //
+  // If the user reaches Chat without authentication,
+  // Login remembers that Chat was the requested page.
+  // =====================================================
+
+  if (
+    !auth ||
+    !auth.access_token
+  ) {
+    window.location.replace(
+      "login.html?next=" +
+      encodeURIComponent(
+        "chat.html"
+      )
+    );
+
     return;
   }
 
-  const TOKEN = auth.access_token;
+
+  const TOKEN =
+    auth.access_token;
+
 
   // =====================================================
   // ELEMENTS
   // =====================================================
 
-  const shell = document.getElementById("chat-shell");
-  const thread = document.getElementById("thread");
-  const form = document.getElementById("composer");
-  const promptBox = document.getElementById("prompt");
-  const sendButton = document.getElementById("send");
-  const libraryButton = document.getElementById("library-attach");
-  const recentList = document.getElementById("recent-list");
-  const newChatButton = document.getElementById("new-chat");
-  const sidebarToggle = document.getElementById("mobile-toggle");
-  const sidebarScrim = document.getElementById("sidebar-scrim");
-  const attachedLibrary = document.getElementById("attached-library");
+  const shell =
+    document.getElementById(
+      "chat-shell"
+    );
 
-  if (!thread || !form || !promptBox || !sendButton) {
-    console.error("Chat page is missing required HTML elements.");
+  const thread =
+    document.getElementById(
+      "thread"
+    );
+
+  const form =
+    document.getElementById(
+      "composer"
+    );
+
+  const promptBox =
+    document.getElementById(
+      "prompt"
+    );
+
+  const sendButton =
+    document.getElementById(
+      "send"
+    );
+
+  const libraryButton =
+    document.getElementById(
+      "library-attach"
+    );
+
+  const recentList =
+    document.getElementById(
+      "recent-list"
+    );
+
+  const newChatButton =
+    document.getElementById(
+      "new-chat"
+    );
+
+  const sidebarToggle =
+    document.getElementById(
+      "mobile-toggle"
+    );
+
+  const sidebarScrim =
+    document.getElementById(
+      "sidebar-scrim"
+    );
+
+  const attachedLibrary =
+    document.getElementById(
+      "attached-library"
+    );
+
+
+  if (
+    !thread ||
+    !form ||
+    !promptBox ||
+    !sendButton
+  ) {
+    console.error(
+      "Chat page is missing required HTML elements."
+    );
+
     return;
   }
+
 
   // =====================================================
   // STATE
   // =====================================================
 
   let conversations = [];
-  let activeConversationId = null;
-  let sending = false;
 
-  let lastSubmittedText = "";
-  let lastSubmittedTime = 0;
+  let activeConversationId =
+    null;
+
+  let sending =
+    false;
+
+  let lastSubmittedText =
+    "";
+
+  let lastSubmittedTime =
+    0;
+
 
   // =====================================================
   // API
   // =====================================================
 
-  async function apiFetch(path, options = {}) {
+  async function apiFetch(
+    path,
+    options = {}
+  ) {
     let response;
 
     const headers = {
-      Authorization: `Bearer ${TOKEN}`,
+      Authorization:
+        `Bearer ${TOKEN}`,
+
       ...(options.headers || {})
     };
+
 
     if (
       options.body &&
       !(options.body instanceof FormData)
     ) {
-      headers["Content-Type"] = "application/json";
+      headers["Content-Type"] =
+        "application/json";
     }
 
+
     try {
-      response = await fetch(
-        `${API_BASE}${path}`,
-        {
-          ...options,
-          headers
-        }
-      );
+      response =
+        await fetch(
+          `${API_BASE}${path}`,
+          {
+            ...options,
+            headers
+          }
+        );
     } catch (error) {
-      console.error("Backend network error:", error);
+      console.error(
+        "Backend network error:",
+        error
+      );
 
       throw new Error(
         "Cannot connect to the CKTSage backend."
       );
     }
 
+
     let data = null;
 
     try {
-      data = await response.json();
+      data =
+        await response.json();
     } catch (error) {
       data = null;
     }
 
-    // IMPORTANT:
-    // Do not automatically remove cktsage-auth here.
-    // The user's persistent login remains saved until
-    // they manually sign out from the Profile page.
-    if (response.status === 401) {
+
+    // Do not automatically delete local authentication.
+    // CKTSage keeps the saved login until manual sign out.
+    if (
+      response.status === 401
+    ) {
       console.error(
         "Authentication rejected by backend."
       );
@@ -136,34 +251,50 @@
       );
     }
 
-    if (!response.ok) {
+
+    if (
+      !response.ok
+    ) {
       let detail =
         data?.detail ||
         data?.message ||
         `Backend error ${response.status}`;
 
-      if (Array.isArray(detail)) {
-        detail = detail
-          .map(
-            item =>
-              item?.msg ||
-              JSON.stringify(item)
-          )
-          .join(", ");
+
+      if (
+        Array.isArray(detail)
+      ) {
+        detail =
+          detail
+            .map(
+              item =>
+                item?.msg ||
+                JSON.stringify(item)
+            )
+            .join(", ");
       }
 
-      throw new Error(detail);
+
+      throw new Error(
+        detail
+      );
     }
+
 
     return data;
   }
+
 
   // =====================================================
   // HTML ESCAPING
   // =====================================================
 
-  function escapeHtml(value) {
-    return String(value ?? "")
+  function escapeHtml(
+    value
+  ) {
+    return String(
+      value ?? ""
+    )
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
@@ -171,67 +302,104 @@
       .replace(/'/g, "&#039;");
   }
 
+
   // =====================================================
   // CLEAN AI TEXT
   // =====================================================
 
-  function cleanAIText(text) {
-    let value = String(text ?? "");
+  function cleanAIText(
+    text
+  ) {
+    let value =
+      String(
+        text ?? ""
+      );
 
-    value = value.replace(/\r\n/g, "\n");
+    value =
+      value.replace(
+        /\r\n/g,
+        "\n"
+      );
 
-    value = value.replace(
-      /\\[ \t]*\n/g,
-      "\n"
-    );
+    value =
+      value.replace(
+        /\\[ \t]*\n/g,
+        "\n"
+      );
 
-    value = value.replace(
-      /\\([#*|>`~\-])/g,
-      "$1"
-    );
+    value =
+      value.replace(
+        /\\([#*|>`~\-])/g,
+        "$1"
+      );
 
-    value = value.replace(
-      /\n{4,}/g,
-      "\n\n\n"
-    );
+    value =
+      value.replace(
+        /\n{4,}/g,
+        "\n\n\n"
+      );
 
     return value.trim();
   }
+
 
   // =====================================================
   // PROTECT MATH
   // =====================================================
 
-  function protectMath(text) {
+  function protectMath(
+    text
+  ) {
     const mathBlocks = [];
 
-    function storeMath(value) {
-      const index = mathBlocks.length;
 
-      mathBlocks.push(value);
+    function storeMath(
+      value
+    ) {
+      const index =
+        mathBlocks.length;
 
-      return `@@CKTSAGE_MATH_${index}@@`;
+      mathBlocks.push(
+        value
+      );
+
+      return (
+        `@@CKTSAGE_MATH_${index}@@`
+      );
     }
 
-    text = text.replace(
-      /\$\$([\s\S]*?)\$\$/g,
-      match => storeMath(match)
-    );
 
-    text = text.replace(
-      /\\\[([\s\S]*?)\\\]/g,
-      match => storeMath(match)
-    );
+    text =
+      text.replace(
+        /\$\$([\s\S]*?)\$\$/g,
+        match =>
+          storeMath(match)
+      );
 
-    text = text.replace(
-      /\\\(([\s\S]*?)\\\)/g,
-      match => storeMath(match)
-    );
 
-    text = text.replace(
-      /\$([^$\n]+?)\$/g,
-      match => storeMath(match)
-    );
+    text =
+      text.replace(
+        /\\\[([\s\S]*?)\\\]/g,
+        match =>
+          storeMath(match)
+      );
+
+
+    text =
+      text.replace(
+        /\\\(([\s\S]*?)\\\)/g,
+        match =>
+          storeMath(match)
+      );
+
+
+    text =
+      text.replace(
+        /\$([^$\n]+?)\$/g,
+        match =>
+          storeMath(match)
+      );
+
 
     return {
       text,
@@ -239,119 +407,190 @@
     };
   }
 
+
   // =====================================================
   // RESTORE MATH
   // =====================================================
 
-  function restoreMath(html, mathBlocks) {
+  function restoreMath(
+    html,
+    mathBlocks
+  ) {
     return html.replace(
       /@@CKTSAGE_MATH_(\d+)@@/g,
-      (match, index) => {
+      (
+        match,
+        index
+      ) => {
         const value =
-          mathBlocks[Number(index)];
+          mathBlocks[
+            Number(index)
+          ];
 
-        if (value === undefined) {
+        if (
+          value === undefined
+        ) {
           return match;
         }
 
-        return escapeHtml(value);
+        return escapeHtml(
+          value
+        );
       }
     );
   }
+
 
   // =====================================================
   // INLINE MARKDOWN
   // =====================================================
 
-  function renderInlineMarkdown(text) {
-    let value = escapeHtml(text);
+  function renderInlineMarkdown(
+    text
+  ) {
+    let value =
+      escapeHtml(text);
 
     const codeBlocks = [];
 
-    value = value.replace(
-      /`([^`\n]+)`/g,
-      (match, code) => {
-        const index = codeBlocks.length;
 
-        codeBlocks.push(
-          `<code>${code}</code>`
-        );
+    value =
+      value.replace(
+        /`([^`\n]+)`/g,
+        (
+          match,
+          code
+        ) => {
+          const index =
+            codeBlocks.length;
 
-        return `@@CKTSAGE_CODE_${index}@@`;
-      }
-    );
+          codeBlocks.push(
+            `<code>${code}</code>`
+          );
 
-    value = value.replace(
-      /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-      (match, label, url) => {
-        return (
-          `<a href="${url}" ` +
-          `target="_blank" ` +
-          `rel="noopener noreferrer">` +
-          `${label}</a>`
-        );
-      }
-    );
+          return (
+            `@@CKTSAGE_CODE_${index}@@`
+          );
+        }
+      );
 
-    value = value.replace(
-      /\*\*([^*\n]+)\*\*/g,
-      "<strong>$1</strong>"
-    );
 
-    value = value.replace(
-      /(^|[^*])\*([^*\n]+)\*/g,
-      "$1<em>$2</em>"
-    );
+    value =
+      value.replace(
+        /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+        (
+          match,
+          label,
+          url
+        ) => {
+          return (
+            `<a href="${url}" ` +
+            `target="_blank" ` +
+            `rel="noopener noreferrer">` +
+            `${label}</a>`
+          );
+        }
+      );
 
-    value = value.replace(
-      /@@CKTSAGE_CODE_(\d+)@@/g,
-      (match, index) => {
-        return (
-          codeBlocks[Number(index)] || ""
-        );
-      }
-    );
+
+    value =
+      value.replace(
+        /\*\*([^*\n]+)\*\*/g,
+        "<strong>$1</strong>"
+      );
+
+
+    value =
+      value.replace(
+        /(^|[^*])\*([^*\n]+)\*/g,
+        "$1<em>$2</em>"
+      );
+
+
+    value =
+      value.replace(
+        /@@CKTSAGE_CODE_(\d+)@@/g,
+        (
+          match,
+          index
+        ) => {
+          return (
+            codeBlocks[
+              Number(index)
+            ] || ""
+          );
+        }
+      );
+
 
     return value;
   }
+
 
   // =====================================================
   // TABLE HELPERS
   // =====================================================
 
-  function isTableSeparator(line) {
-    const cells = line
-      .trim()
-      .replace(/^\|/, "")
-      .replace(/\|$/, "")
-      .split("|")
-      .map(cell => cell.trim());
+  function isTableSeparator(
+    line
+  ) {
+    const cells =
+      line
+        .trim()
+        .replace(/^\|/, "")
+        .replace(/\|$/, "")
+        .split("|")
+        .map(
+          cell =>
+            cell.trim()
+        );
 
-    if (!cells.length) {
+
+    if (
+      !cells.length
+    ) {
       return false;
     }
 
+
     return cells.every(
-      cell => /^:?-{3,}:?$/.test(cell)
+      cell =>
+        /^:?-{3,}:?$/.test(
+          cell
+        )
     );
   }
 
-  function parseTableRow(line) {
+
+  function parseTableRow(
+    line
+  ) {
     return line
       .trim()
       .replace(/^\|/, "")
       .replace(/\|$/, "")
       .split("|")
-      .map(cell => cell.trim());
+      .map(
+        cell =>
+          cell.trim()
+      );
   }
 
-  function renderTable(lines, startIndex) {
+
+  function renderTable(
+    lines,
+    startIndex
+  ) {
     const headerCells =
-      parseTableRow(lines[startIndex]);
+      parseTableRow(
+        lines[startIndex]
+      );
 
     const rows = [];
 
-    let index = startIndex + 2;
+    let index =
+      startIndex + 2;
+
 
     while (
       index < lines.length &&
@@ -359,111 +598,204 @@
       lines[index].trim() !== ""
     ) {
       rows.push(
-        parseTableRow(lines[index])
+        parseTableRow(
+          lines[index]
+        )
       );
 
       index += 1;
     }
 
+
     let html =
       '<div class="markdown-table-wrap">' +
       '<table class="markdown-table">';
 
-    html += "<thead><tr>";
 
-    headerCells.forEach(cell => {
+    html +=
+      "<thead><tr>";
+
+
+    headerCells.forEach(
+      cell => {
+        html +=
+          `<th>${renderInlineMarkdown(
+            cell
+          )}</th>`;
+      }
+    );
+
+
+    html +=
+      "</tr></thead>";
+
+
+    if (
+      rows.length
+    ) {
       html +=
-        `<th>${renderInlineMarkdown(cell)}</th>`;
-    });
+        "<tbody>";
 
-    html += "</tr></thead>";
 
-    if (rows.length) {
-      html += "<tbody>";
+      rows.forEach(
+        row => {
+          html +=
+            "<tr>";
 
-      rows.forEach(row => {
-        html += "<tr>";
 
-        headerCells.forEach(
-          (unused, cellIndex) => {
-            html +=
-              `<td>${renderInlineMarkdown(
-                row[cellIndex] || ""
-              )}</td>`;
-          }
-        );
+          headerCells.forEach(
+            (
+              unused,
+              cellIndex
+            ) => {
+              html +=
+                `<td>${renderInlineMarkdown(
+                  row[cellIndex] || ""
+                )}</td>`;
+            }
+          );
 
-        html += "</tr>";
-      });
 
-      html += "</tbody>";
+          html +=
+            "</tr>";
+        }
+      );
+
+
+      html +=
+        "</tbody>";
     }
 
-    html += "</table></div>";
+
+    html +=
+      "</table></div>";
+
 
     return {
       html,
-      nextIndex: index
+      nextIndex:
+        index
     };
   }
+
 
   // =====================================================
   // MARKDOWN RENDERER
   // =====================================================
 
-  function renderMarkdown(input) {
+  function renderMarkdown(
+    input
+  ) {
     const cleaned =
-      cleanAIText(input);
+      cleanAIText(
+        input
+      );
+
 
     const protectedData =
-      protectMath(cleaned);
+      protectMath(
+        cleaned
+      );
+
 
     const lines =
-      protectedData.text.split("\n");
+      protectedData.text.split(
+        "\n"
+      );
 
-    let html = "";
-    let index = 0;
 
-    let unorderedListOpen = false;
-    let orderedListOpen = false;
+    let html =
+      "";
+
+    let index =
+      0;
+
+    let unorderedListOpen =
+      false;
+
+    let orderedListOpen =
+      false;
+
 
     function closeLists() {
-      if (unorderedListOpen) {
-        html += "</ul>";
-        unorderedListOpen = false;
+      if (
+        unorderedListOpen
+      ) {
+        html +=
+          "</ul>";
+
+        unorderedListOpen =
+          false;
       }
 
-      if (orderedListOpen) {
-        html += "</ol>";
-        orderedListOpen = false;
+
+      if (
+        orderedListOpen
+      ) {
+        html +=
+          "</ol>";
+
+        orderedListOpen =
+          false;
       }
     }
 
-    while (index < lines.length) {
-      const rawLine = lines[index];
-      const line = rawLine.trim();
 
-      if (!line) {
+    while (
+      index <
+      lines.length
+    ) {
+      const rawLine =
+        lines[index];
+
+      const line =
+        rawLine.trim();
+
+
+      if (
+        !line
+      ) {
         closeLists();
+
         index += 1;
+
         continue;
       }
 
-      if (line.startsWith("```")) {
+
+      // =================================================
+      // CODE BLOCK
+      // =================================================
+
+      if (
+        line.startsWith(
+          "```"
+        )
+      ) {
         closeLists();
 
-        const language =
-          line.slice(3).trim();
 
-        const codeLines = [];
+        const language =
+          line
+            .slice(3)
+            .trim();
+
+
+        const codeLines =
+          [];
+
 
         index += 1;
 
+
         while (
-          index < lines.length &&
+          index <
+            lines.length &&
           !lines[index]
             .trim()
-            .startsWith("```")
+            .startsWith(
+              "```"
+            )
         ) {
           codeLines.push(
             lines[index]
@@ -472,9 +804,14 @@
           index += 1;
         }
 
-        if (index < lines.length) {
+
+        if (
+          index <
+          lines.length
+        ) {
           index += 1;
         }
+
 
         html +=
           `<pre class="markdown-code-block">` +
@@ -486,32 +823,59 @@
           )}` +
           `</code></pre>`;
 
+
         continue;
       }
 
+
+      // =================================================
+      // DISPLAY MATH
+      // =================================================
+
       if (
-        /^@@CKTSAGE_MATH_\d+@@$/.test(line)
+        /^@@CKTSAGE_MATH_\d+@@$/.test(
+          line
+        )
       ) {
         closeLists();
 
-        const mathIndex =
-          Number(
-            line.match(/\d+/)[0]
+
+        const match =
+          line.match(
+            /\d+/
           );
 
+
+        const mathIndex =
+          match
+            ? Number(match[0])
+            : -1;
+
+
         const mathValue =
-          protectedData.mathBlocks[
-            mathIndex
-          ] || "";
+          protectedData
+            .mathBlocks[
+              mathIndex
+            ] || "";
+
 
         const isDisplay =
-          mathValue.startsWith("$$") ||
-          mathValue.startsWith("\\[");
+          mathValue.startsWith(
+            "$$"
+          ) ||
+          mathValue.startsWith(
+            "\\["
+          );
 
-        if (isDisplay) {
+
+        if (
+          isDisplay
+        ) {
           html +=
             `<div class="math-block">` +
-            `${escapeHtml(mathValue)}` +
+            `${escapeHtml(
+              mathValue
+            )}` +
             `</div>`;
         } else {
           html +=
@@ -520,18 +884,29 @@
             )}</p>`;
         }
 
+
         index += 1;
+
         continue;
       }
 
+
+      // =================================================
+      // TABLE
+      // =================================================
+
       if (
         line.includes("|") &&
-        index + 1 < lines.length &&
+        index + 1 <
+          lines.length &&
         isTableSeparator(
-          lines[index + 1]
+          lines[
+            index + 1
+          ]
         )
       ) {
         closeLists();
+
 
         const table =
           renderTable(
@@ -539,22 +914,38 @@
             index
           );
 
-        html += table.html;
-        index = table.nextIndex;
+
+        html +=
+          table.html;
+
+
+        index =
+          table.nextIndex;
+
 
         continue;
       }
+
+
+      // =================================================
+      // HEADING
+      // =================================================
 
       const heading =
         line.match(
           /^(#{1,6})\s+(.+)$/
         );
 
-      if (heading) {
+
+      if (
+        heading
+      ) {
         closeLists();
+
 
         const level =
           heading[1].length;
+
 
         html +=
           `<h${level}>` +
@@ -563,50 +954,96 @@
           )}` +
           `</h${level}>`;
 
+
         index += 1;
+
         continue;
       }
 
+
+      // =================================================
+      // HORIZONTAL RULE
+      // =================================================
+
       if (
-        /^(-{3,}|\*{3,}|_{3,})$/.test(line)
+        /^(-{3,}|\*{3,}|_{3,})$/.test(
+          line
+        )
       ) {
         closeLists();
 
-        html += "<hr>";
+        html +=
+          "<hr>";
 
         index += 1;
+
         continue;
       }
 
-      if (/^>\s?/.test(line)) {
+
+      // =================================================
+      // BLOCKQUOTE
+      // =================================================
+
+      if (
+        /^>\s?/.test(
+          line
+        )
+      ) {
         closeLists();
+
 
         html +=
           "<blockquote>" +
           renderInlineMarkdown(
-            line.replace(/^>\s?/, "")
+            line.replace(
+              /^>\s?/,
+              ""
+            )
           ) +
           "</blockquote>";
 
+
         index += 1;
+
         continue;
       }
+
+
+      // =================================================
+      // UNORDERED LIST
+      // =================================================
 
       const unordered =
         line.match(
           /^[-*+]\s+(.+)$/
         );
 
-      if (unordered) {
-        if (orderedListOpen) {
-          html += "</ol>";
-          orderedListOpen = false;
+
+      if (
+        unordered
+      ) {
+        if (
+          orderedListOpen
+        ) {
+          html +=
+            "</ol>";
+
+          orderedListOpen =
+            false;
         }
 
-        if (!unorderedListOpen) {
-          html += "<ul>";
-          unorderedListOpen = true;
+
+        if (
+          !unorderedListOpen
+        ) {
+          html +=
+            "<ul>";
+
+          unorderedListOpen =
+            true;
         }
+
 
         html +=
           "<li>" +
@@ -615,25 +1052,47 @@
           ) +
           "</li>";
 
+
         index += 1;
+
         continue;
       }
+
+
+      // =================================================
+      // ORDERED LIST
+      // =================================================
 
       const ordered =
         line.match(
           /^\d+\.\s+(.+)$/
         );
 
-      if (ordered) {
-        if (unorderedListOpen) {
-          html += "</ul>";
-          unorderedListOpen = false;
+
+      if (
+        ordered
+      ) {
+        if (
+          unorderedListOpen
+        ) {
+          html +=
+            "</ul>";
+
+          unorderedListOpen =
+            false;
         }
 
-        if (!orderedListOpen) {
-          html += "<ol>";
-          orderedListOpen = true;
+
+        if (
+          !orderedListOpen
+        ) {
+          html +=
+            "<ol>";
+
+          orderedListOpen =
+            true;
         }
+
 
         html +=
           "<li>" +
@@ -642,31 +1101,51 @@
           ) +
           "</li>";
 
+
         index += 1;
+
         continue;
       }
 
+
+      // =================================================
+      // PARAGRAPH
+      // =================================================
+
       closeLists();
 
-      const paragraphLines = [
-        line
-      ];
+
+      const paragraphLines =
+        [line];
+
 
       index += 1;
 
-      while (index < lines.length) {
-        const next =
-          lines[index].trim();
 
-        if (!next) {
-          break;
-        }
+      while (
+        index <
+        lines.length
+      ) {
+        const next =
+          lines[index]
+            .trim();
+
 
         if (
-          next.startsWith("```")
+          !next
         ) {
           break;
         }
+
+
+        if (
+          next.startsWith(
+            "```"
+          )
+        ) {
+          break;
+        }
+
 
         if (
           /^@@CKTSAGE_MATH_\d+@@$/.test(
@@ -676,29 +1155,42 @@
           break;
         }
 
+
         if (
-          /^(#{1,6})\s+/.test(next)
+          /^(#{1,6})\s+/.test(
+            next
+          )
         ) {
           break;
         }
 
+
         if (
-          /^[-*+]\s+/.test(next)
+          /^[-*+]\s+/.test(
+            next
+          )
         ) {
           break;
         }
 
+
         if (
-          /^\d+\.\s+/.test(next)
+          /^\d+\.\s+/.test(
+            next
+          )
         ) {
           break;
         }
 
+
         if (
-          /^>\s?/.test(next)
+          /^>\s?/.test(
+            next
+          )
         ) {
           break;
         }
+
 
         if (
           /^(-{3,}|\*{3,}|_{3,})$/.test(
@@ -708,30 +1200,43 @@
           break;
         }
 
+
         if (
           next.includes("|") &&
-          index + 1 < lines.length &&
+          index + 1 <
+            lines.length &&
           isTableSeparator(
-            lines[index + 1]
+            lines[
+              index + 1
+            ]
           )
         ) {
           break;
         }
 
-        paragraphLines.push(next);
+
+        paragraphLines.push(
+          next
+        );
+
 
         index += 1;
       }
 
+
       html +=
         "<p>" +
         renderInlineMarkdown(
-          paragraphLines.join(" ")
+          paragraphLines.join(
+            " "
+          )
         ) +
         "</p>";
     }
 
+
     closeLists();
+
 
     html =
       restoreMath(
@@ -739,34 +1244,52 @@
         protectedData.mathBlocks
       );
 
+
     return html;
   }
+
 
   // =====================================================
   // MATHJAX
   // =====================================================
 
-  async function typesetMath(element) {
-    if (!element) {
+  async function typesetMath(
+    element
+  ) {
+    if (
+      !element
+    ) {
       return;
     }
 
+
     try {
       if (
-        window.MathJax?.startup?.promise
+        window.MathJax
+          ?.startup
+          ?.promise
       ) {
-        await window.MathJax.startup.promise;
+        await window
+          .MathJax
+          .startup
+          .promise;
       }
 
+
       if (
-        typeof window.MathJax?.typesetPromise !==
+        typeof window
+          .MathJax
+          ?.typesetPromise !==
         "function"
       ) {
         return;
       }
 
+
       if (
-        typeof window.MathJax?.typesetClear ===
+        typeof window
+          .MathJax
+          ?.typesetClear ===
         "function"
       ) {
         window.MathJax.typesetClear(
@@ -774,9 +1297,13 @@
         );
       }
 
-      await window.MathJax.typesetPromise(
-        [element]
-      );
+
+      await window
+        .MathJax
+        .typesetPromise(
+          [element]
+        );
+
     } catch (error) {
       console.error(
         "MathJax error:",
@@ -785,16 +1312,20 @@
     }
   }
 
+
   // =====================================================
   // SCROLL
   // =====================================================
 
   function scrollToBottom() {
-    requestAnimationFrame(() => {
-      thread.scrollTop =
-        thread.scrollHeight;
-    });
+    requestAnimationFrame(
+      () => {
+        thread.scrollTop =
+          thread.scrollHeight;
+      }
+    );
   }
+
 
   // =====================================================
   // WELCOME
@@ -822,69 +1353,109 @@
     `;
   }
 
+
   // =====================================================
   // ADD MESSAGE
   // =====================================================
 
-  function addMessage(role, text) {
+  function addMessage(
+    role,
+    text
+  ) {
     document
-      .getElementById("welcome")
+      .getElementById(
+        "welcome"
+      )
       ?.remove();
 
+
     const row =
-      document.createElement("article");
+      document.createElement(
+        "article"
+      );
+
 
     row.className =
       `message ${role}`;
 
+
     const avatar =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
+
 
     avatar.className =
       "avatar";
+
 
     avatar.textContent =
       role === "user"
         ? "You"
         : "ϟ";
 
+
     const content =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
+
 
     content.className =
       "message-content";
 
-    if (role === "assistant") {
+
+    if (
+      role ===
+      "assistant"
+    ) {
       content.classList.add(
         "markdown-content"
       );
 
+
       content.innerHTML =
-        renderMarkdown(text);
+        renderMarkdown(
+          text
+        );
+
     } else {
       content.textContent =
         text;
     }
+
 
     row.append(
       avatar,
       content
     );
 
-    thread.appendChild(row);
+
+    thread.appendChild(
+      row
+    );
+
 
     scrollToBottom();
 
-    if (role === "assistant") {
-      typesetMath(content).then(
+
+    if (
+      role ===
+      "assistant"
+    ) {
+      typesetMath(
+        content
+      ).then(
         () => {
           scrollToBottom();
         }
       );
     }
 
+
     return row;
   }
+
 
   // =====================================================
   // THINKING
@@ -892,19 +1463,28 @@
 
   function addThinkingMessage() {
     document
-      .getElementById("welcome")
+      .getElementById(
+        "welcome"
+      )
       ?.remove();
+
 
     removeThinkingMessage();
 
+
     const row =
-      document.createElement("article");
+      document.createElement(
+        "article"
+      );
+
 
     row.id =
       "ai-thinking-message";
 
+
     row.className =
       "message assistant";
+
 
     row.innerHTML = `
       <div class="avatar">
@@ -916,10 +1496,15 @@
       </div>
     `;
 
-    thread.appendChild(row);
+
+    thread.appendChild(
+      row
+    );
+
 
     scrollToBottom();
   }
+
 
   function removeThinkingMessage() {
     document
@@ -928,6 +1513,7 @@
       )
       ?.remove();
   }
+
 
   // =====================================================
   // LOAD CONVERSATIONS
@@ -940,19 +1526,27 @@
           "/conversations"
         );
 
+
       conversations =
-        Array.isArray(data)
+        Array.isArray(
+          data
+        )
           ? data
           : [];
 
+
       renderRecents();
+
     } catch (error) {
       console.error(
         "Load conversations error:",
         error
       );
 
-      if (recentList) {
+
+      if (
+        recentList
+      ) {
         recentList.innerHTML =
           `<p class="recent-empty">${escapeHtml(
             error.message
@@ -961,18 +1555,26 @@
     }
   }
 
+
   // =====================================================
   // RECENTS
   // =====================================================
 
   function renderRecents() {
-    if (!recentList) {
+    if (
+      !recentList
+    ) {
       return;
     }
 
-    recentList.innerHTML = "";
 
-    if (!conversations.length) {
+    recentList.innerHTML =
+      "";
+
+
+    if (
+      !conversations.length
+    ) {
       recentList.innerHTML = `
         <p class="recent-empty">
           Your recent questions will appear here.
@@ -982,30 +1584,42 @@
       return;
     }
 
+
     conversations.forEach(
       conversation => {
         const row =
-          document.createElement("div");
+          document.createElement(
+            "div"
+          );
+
 
         row.className =
           "recent-item-row";
 
+
         const openButton =
-          document.createElement("button");
+          document.createElement(
+            "button"
+          );
+
 
         openButton.type =
           "button";
 
+
         openButton.className =
           "recent-item";
+
 
         openButton.textContent =
           conversation.title ||
           "New conversation";
 
+
         if (
           Number(
-            conversation.conversation_id
+            conversation
+              .conversation_id
           ) ===
           Number(
             activeConversationId
@@ -1016,26 +1630,35 @@
           );
         }
 
+
         openButton.addEventListener(
           "click",
           () => {
             openConversation(
-              conversation.conversation_id
+              conversation
+                .conversation_id
             );
           }
         );
 
+
         const deleteButton =
-          document.createElement("button");
+          document.createElement(
+            "button"
+          );
+
 
         deleteButton.type =
           "button";
 
+
         deleteButton.className =
           "recent-delete";
 
+
         deleteButton.textContent =
           "×";
+
 
         deleteButton.addEventListener(
           "click",
@@ -1043,21 +1666,28 @@
             event.preventDefault();
             event.stopPropagation();
 
+
             deleteConversation(
-              conversation.conversation_id
+              conversation
+                .conversation_id
             );
           }
         );
+
 
         row.append(
           openButton,
           deleteButton
         );
 
-        recentList.appendChild(row);
+
+        recentList.appendChild(
+          row
+        );
       }
     );
   }
+
 
   // =====================================================
   // CREATE CONVERSATION
@@ -1072,47 +1702,68 @@
         "New conversation"
       ).trim();
 
-    if (!title) {
+
+    if (
+      !title
+    ) {
       title =
         "New conversation";
     }
 
-    if (title.length > 42) {
+
+    if (
+      title.length >
+      42
+    ) {
       title =
-        title.slice(0, 39) +
+        title.slice(
+          0,
+          39
+        ) +
         "...";
     }
+
 
     const conversation =
       await apiFetch(
         "/conversations",
         {
-          method: "POST",
+          method:
+            "POST",
 
-          body: JSON.stringify({
-            title
-          })
+          body:
+            JSON.stringify({
+              title
+            })
         }
       );
 
+
     if (
       !conversation ||
-      !conversation.conversation_id
+      !conversation
+        .conversation_id
     ) {
       throw new Error(
         "Conversation was not created."
       );
     }
 
+
     activeConversationId =
       Number(
-        conversation.conversation_id
+        conversation
+          .conversation_id
       );
+
 
     localStorage.setItem(
       ACTIVE_CHAT_KEY,
-      String(activeConversationId)
+      String(
+        activeConversationId
+      )
     );
+
 
     if (
       !conversations.some(
@@ -1128,10 +1779,13 @@
       );
     }
 
+
     renderRecents();
+
 
     return conversation;
   }
+
 
   // =====================================================
   // SAVE MESSAGE
@@ -1145,15 +1799,18 @@
     return apiFetch(
       `/conversations/${conversationId}/messages`,
       {
-        method: "POST",
+        method:
+          "POST",
 
-        body: JSON.stringify({
-          role,
-          content
-        })
+        body:
+          JSON.stringify({
+            role,
+            content
+          })
       }
     );
   }
+
 
   // =====================================================
   // ASK AI
@@ -1166,74 +1823,102 @@
     return apiFetch(
       `/conversations/${conversationId}/ai`,
       {
-        method: "POST",
+        method:
+          "POST",
 
-        body: JSON.stringify({
-          message
-        })
+        body:
+          JSON.stringify({
+            message
+          })
       }
     );
   }
+
 
   // =====================================================
   // SEND MESSAGE
   // =====================================================
 
-  async function sendMessage(rawText) {
+  async function sendMessage(
+    rawText
+  ) {
     const text =
       String(
         rawText || ""
       ).trim();
 
-    if (!text) {
-      return;
-    }
-
-    if (sending) {
-      return;
-    }
-
-    const now =
-      Date.now();
 
     if (
-      text === lastSubmittedText &&
-      now - lastSubmittedTime < 1500
+      !text
     ) {
       return;
     }
 
+
+    if (
+      sending
+    ) {
+      return;
+    }
+
+
+    const now =
+      Date.now();
+
+
+    if (
+      text ===
+        lastSubmittedText &&
+      now -
+        lastSubmittedTime <
+        1500
+    ) {
+      return;
+    }
+
+
     lastSubmittedText =
       text;
+
 
     lastSubmittedTime =
       now;
 
+
     sending =
       true;
 
+
     sendButton.disabled =
       true;
+
 
     addMessage(
       "user",
       text
     );
 
+
     promptBox.value =
       "";
+
 
     promptBox.style.height =
       "auto";
 
+
     addThinkingMessage();
 
+
     try {
-      if (!activeConversationId) {
+      if (
+        !activeConversationId
+      ) {
         await createConversation(
           text
         );
       }
+
 
       await saveMessage(
         activeConversationId,
@@ -1241,29 +1926,38 @@
         text
       );
 
+
       const result =
         await askAI(
           activeConversationId,
           text
         );
 
+
       removeThinkingMessage();
+
 
       const reply =
         String(
-          result?.reply || ""
+          result?.reply ||
+          ""
         ).trim();
 
-      if (!reply) {
+
+      if (
+        !reply
+      ) {
         throw new Error(
           "AI returned no response."
         );
       }
 
+
       addMessage(
         "assistant",
         reply
       );
+
 
       await saveMessage(
         activeConversationId,
@@ -1271,33 +1965,41 @@
         reply
       );
 
+
       await loadConversations();
+
 
       await loadAttachedLibrary();
 
     } catch (error) {
       removeThinkingMessage();
 
+
       console.error(
         "Send message error:",
         error
       );
+
 
       addMessage(
         "assistant",
         error?.message ||
         "The message could not be sent."
       );
+
     } finally {
       sending =
         false;
 
+
       sendButton.disabled =
         false;
+
 
       promptBox.focus();
     }
   }
+
 
   // =====================================================
   // OPEN CONVERSATION
@@ -1307,21 +2009,31 @@
     conversationId
   ) {
     const id =
-      Number(conversationId);
+      Number(
+        conversationId
+      );
 
-    if (!id) {
+
+    if (
+      !id
+    ) {
       return;
     }
 
+
     activeConversationId =
       id;
+
 
     localStorage.setItem(
       ACTIVE_CHAT_KEY,
       String(id)
     );
 
-    thread.innerHTML = "";
+
+    thread.innerHTML =
+      "";
+
 
     try {
       const messages =
@@ -1329,11 +2041,15 @@
           `/conversations/${id}/messages`
         );
 
+
       if (
-        !Array.isArray(messages) ||
+        !Array.isArray(
+          messages
+        ) ||
         !messages.length
       ) {
         showWelcome();
+
       } else {
         for (
           const message
@@ -1346,20 +2062,26 @@
         }
       }
 
+
       await loadAttachedLibrary();
 
+
       renderRecents();
+
 
       shell?.classList.remove(
         "sidebar-open"
       );
 
+
       scrollToBottom();
+
     } catch (error) {
       console.error(
         "Open conversation error:",
         error
       );
+
 
       addMessage(
         "assistant",
@@ -1368,6 +2090,7 @@
       );
     }
   }
+
 
   // =====================================================
   // DELETE CONVERSATION
@@ -1387,9 +2110,11 @@
           )
       );
 
+
     const title =
       conversation?.title ||
       "this chat";
+
 
     if (
       !window.confirm(
@@ -1399,13 +2124,16 @@
       return;
     }
 
+
     try {
       await apiFetch(
         `/conversations/${conversationId}`,
         {
-          method: "DELETE"
+          method:
+            "DELETE"
         }
       );
+
 
       conversations =
         conversations.filter(
@@ -1418,6 +2146,7 @@
             )
         );
 
+
       if (
         Number(
           activeConversationId
@@ -1429,14 +2158,18 @@
         activeConversationId =
           null;
 
+
         localStorage.removeItem(
           ACTIVE_CHAT_KEY
         );
 
+
         showWelcome();
       }
 
+
       renderRecents();
+
     } catch (error) {
       alert(
         error?.message ||
@@ -1445,24 +2178,33 @@
     }
   }
 
+
   // =====================================================
   // LIBRARY
   // =====================================================
 
   async function loadAttachedLibrary() {
-    if (!attachedLibrary) {
+    if (
+      !attachedLibrary
+    ) {
       return;
     }
 
-    if (!activeConversationId) {
+
+    if (
+      !activeConversationId
+    ) {
       attachedLibrary.hidden =
         true;
+
 
       attachedLibrary.innerHTML =
         "";
 
+
       return;
     }
+
 
     try {
       const items =
@@ -1470,11 +2212,15 @@
           `/conversations/${activeConversationId}/library`
         );
 
+
       attachedLibrary.innerHTML =
         "";
 
+
       if (
-        !Array.isArray(items) ||
+        !Array.isArray(
+          items
+        ) ||
         !items.length
       ) {
         attachedLibrary.hidden =
@@ -1483,64 +2229,90 @@
         return;
       }
 
+
       attachedLibrary.hidden =
         false;
 
+
       const label =
-        document.createElement("span");
+        document.createElement(
+          "span"
+        );
+
 
       label.className =
         "attached-library-label";
 
+
       label.textContent =
         "Using:";
+
 
       attachedLibrary.appendChild(
         label
       );
 
-      items.forEach(item => {
-        const chip =
-          document.createElement("span");
 
-        chip.className =
-          "attached-library-chip";
-
-        const name =
-          document.createElement("span");
-
-        name.textContent =
-          item.file_name ||
-          item.title ||
-          "Library item";
-
-        const remove =
-          document.createElement("button");
-
-        remove.type =
-          "button";
-
-        remove.textContent =
-          "×";
-
-        remove.addEventListener(
-          "click",
-          async () => {
-            await removeLibraryItem(
-              item.library_item_id
+      items.forEach(
+        item => {
+          const chip =
+            document.createElement(
+              "span"
             );
-          }
-        );
 
-        chip.append(
-          name,
-          remove
-        );
 
-        attachedLibrary.appendChild(
-          chip
-        );
-      });
+          chip.className =
+            "attached-library-chip";
+
+
+          const name =
+            document.createElement(
+              "span"
+            );
+
+
+          name.textContent =
+            item.file_name ||
+            item.title ||
+            "Library item";
+
+
+          const remove =
+            document.createElement(
+              "button"
+            );
+
+
+          remove.type =
+            "button";
+
+
+          remove.textContent =
+            "×";
+
+
+          remove.addEventListener(
+            "click",
+            async () => {
+              await removeLibraryItem(
+                item.library_item_id
+              );
+            }
+          );
+
+
+          chip.append(
+            name,
+            remove
+          );
+
+
+          attachedLibrary.appendChild(
+            chip
+          );
+        }
+      );
+
     } catch (error) {
       console.error(
         "Could not load attached Library:",
@@ -1549,22 +2321,29 @@
     }
   }
 
+
   async function removeLibraryItem(
     libraryItemId
   ) {
-    if (!activeConversationId) {
+    if (
+      !activeConversationId
+    ) {
       return;
     }
+
 
     try {
       await apiFetch(
         `/conversations/${activeConversationId}/library/${libraryItemId}`,
         {
-          method: "DELETE"
+          method:
+            "DELETE"
         }
       );
 
+
       await loadAttachedLibrary();
+
     } catch (error) {
       alert(
         error?.message ||
@@ -1573,26 +2352,33 @@
     }
   }
 
-  libraryButton?.addEventListener(
-    "click",
-    async () => {
-      try {
-        if (!activeConversationId) {
-          await createConversation(
-            "New conversation"
+
+  libraryButton
+    ?.addEventListener(
+      "click",
+      async () => {
+        try {
+          if (
+            !activeConversationId
+          ) {
+            await createConversation(
+              "New conversation"
+            );
+          }
+
+
+          window.location.href =
+            "library.html";
+
+        } catch (error) {
+          alert(
+            error?.message ||
+            "Could not open Library."
           );
         }
-
-        window.location.href =
-          "library.html";
-      } catch (error) {
-        alert(
-          error?.message ||
-          "Could not open Library."
-        );
       }
-    }
-  );
+    );
+
 
   // =====================================================
   // NEW CHAT
@@ -1602,45 +2388,61 @@
     activeConversationId =
       null;
 
+
     localStorage.removeItem(
       ACTIVE_CHAT_KEY
     );
 
-    if (attachedLibrary) {
+
+    if (
+      attachedLibrary
+    ) {
       attachedLibrary.hidden =
         true;
+
 
       attachedLibrary.innerHTML =
         "";
     }
 
+
     lastSubmittedText =
       "";
+
 
     lastSubmittedTime =
       0;
 
+
     showWelcome();
+
 
     promptBox.value =
       "";
 
+
     promptBox.style.height =
       "auto";
 
+
     promptBox.focus();
 
+
     renderRecents();
+
 
     shell?.classList.remove(
       "sidebar-open"
     );
   }
 
-  newChatButton?.addEventListener(
-    "click",
-    newChat
-  );
+
+  newChatButton
+    ?.addEventListener(
+      "click",
+      newChat
+    );
+
 
   // =====================================================
   // FORM SUBMIT
@@ -1651,11 +2453,13 @@
     event => {
       event.preventDefault();
 
+
       sendMessage(
         promptBox.value
       );
     }
   );
+
 
   // =====================================================
   // ENTER SEND
@@ -1665,30 +2469,43 @@
     "keydown",
     event => {
       if (
-        event.key !== "Enter"
+        event.key !==
+        "Enter"
       ) {
         return;
       }
 
-      if (event.shiftKey) {
+
+      if (
+        event.shiftKey
+      ) {
         return;
       }
 
-      if (event.isComposing) {
+
+      if (
+        event.isComposing
+      ) {
         return;
       }
+
 
       event.preventDefault();
 
-      if (event.repeat) {
+
+      if (
+        event.repeat
+      ) {
         return;
       }
+
 
       if (
         typeof form.requestSubmit ===
         "function"
       ) {
         form.requestSubmit();
+
       } else {
         sendMessage(
           promptBox.value
@@ -1696,6 +2513,7 @@
       }
     }
   );
+
 
   // =====================================================
   // PASTE
@@ -1709,6 +2527,7 @@
           promptBox.style.height =
             "auto";
 
+
           promptBox.style.height =
             `${Math.min(
               promptBox.scrollHeight,
@@ -1720,6 +2539,7 @@
     }
   );
 
+
   // =====================================================
   // TEXTAREA HEIGHT
   // =====================================================
@@ -1730,6 +2550,7 @@
       promptBox.style.height =
         "auto";
 
+
       promptBox.style.height =
         `${Math.min(
           promptBox.scrollHeight,
@@ -1738,41 +2559,61 @@
     }
   );
 
+
   // =====================================================
   // SIDEBAR
   // =====================================================
 
-  sidebarToggle?.addEventListener(
-    "click",
-    () => {
-      const mobile =
-        window.matchMedia(
-          "(max-width: 760px)"
-        ).matches;
+  sidebarToggle
+    ?.addEventListener(
+      "click",
+      () => {
+        const mobile =
+          window.matchMedia(
+            "(max-width: 760px)"
+          ).matches;
 
-      if (mobile) {
-        shell?.classList.toggle(
+
+        if (
+          mobile
+        ) {
+          shell?.classList.toggle(
+            "sidebar-open"
+          );
+
+        } else {
+          shell?.classList.toggle(
+            "sidebar-collapsed"
+          );
+        }
+      }
+    );
+
+
+  sidebarScrim
+    ?.addEventListener(
+      "click",
+      () => {
+        shell?.classList.remove(
           "sidebar-open"
         );
-      } else {
-        shell?.classList.toggle(
-          "sidebar-collapsed"
-        );
       }
-    }
-  );
+    );
 
-  sidebarScrim?.addEventListener(
-    "click",
-    () => {
-      shell?.classList.remove(
-        "sidebar-open"
-      );
-    }
-  );
 
   // =====================================================
   // RECEIVE PROMPT FROM INDEX
+  //
+  // There are now two possible sources:
+  //
+  // 1. Logged-in user:
+  //    chat.html?prompt=...
+  //
+  // 2. Logged-out user:
+  //    index saves cktsage-pending-prompt
+  //    -> Login
+  //    -> Chat
+  //    -> read pending prompt here
   // =====================================================
 
   async function handleIncomingPrompt() {
@@ -1781,15 +2622,24 @@
         window.location.search
       );
 
-    let incomingPrompt =
-      params.get("prompt");
 
-    if (!incomingPrompt) {
+    let incomingPrompt =
+      params.get(
+        "prompt"
+      );
+
+
+    // URL prompt gets priority.
+    // Otherwise use the question preserved before Login.
+    if (
+      !incomingPrompt
+    ) {
       incomingPrompt =
         localStorage.getItem(
           PENDING_PROMPT_KEY
         );
     }
+
 
     if (
       !incomingPrompt ||
@@ -1798,19 +2648,28 @@
       return;
     }
 
+
     const cleanPrompt =
       incomingPrompt.trim();
 
+
+    // IMPORTANT:
+    // Remove the pending prompt only once Chat has
+    // successfully reached the point where it can process it.
     localStorage.removeItem(
       PENDING_PROMPT_KEY
     );
 
+
+    // Remove ?prompt= from the address bar so refreshing
+    // Chat does not automatically submit the same question.
     try {
       history.replaceState(
         null,
         "",
         "chat.html"
       );
+
     } catch (error) {
       console.warn(
         "Could not clean chat URL:",
@@ -1818,13 +2677,16 @@
       );
     }
 
+
     promptBox.value =
       cleanPrompt;
+
 
     await sendMessage(
       cleanPrompt
     );
   }
+
 
   // =====================================================
   // START
@@ -1833,8 +2695,10 @@
   async function start() {
     showWelcome();
 
+
     try {
       await loadConversations();
+
 
       const savedId =
         Number(
@@ -1842,6 +2706,7 @@
             ACTIVE_CHAT_KEY
           )
         );
+
 
       if (
         savedId > 0 &&
@@ -1856,25 +2721,35 @@
         await openConversation(
           savedId
         );
+
       } else {
         activeConversationId =
           null;
+
 
         localStorage.removeItem(
           ACTIVE_CHAT_KEY
         );
       }
 
+
+      // Must run AFTER conversation initialization.
+      // This prevents the incoming Index question from
+      // being lost during Chat startup.
       await handleIncomingPrompt();
+
     } catch (error) {
       console.error(
         "Chat startup error:",
         error
       );
+
     } finally {
       promptBox.focus();
     }
   }
 
+
   start();
+
 })();

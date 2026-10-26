@@ -26,51 +26,6 @@
 <body>
 
   <!-- =====================================================
-       CHECK FOR SAVED LOGIN
-  ====================================================== -->
-
-  <script>
-    (() => {
-
-      const AUTH_KEY =
-        "cktsage-auth";
-
-
-      let auth =
-        null;
-
-
-      try {
-
-        auth =
-          JSON.parse(
-            localStorage.getItem(
-              AUTH_KEY
-            ) || "null"
-          );
-
-      } catch (error) {
-
-        auth =
-          null;
-      }
-
-
-      if (
-        auth &&
-        auth.access_token
-      ) {
-
-        window.location.replace(
-          "index.html"
-        );
-      }
-
-    })();
-  </script>
-
-
-  <!-- =====================================================
        BACKGROUND
   ====================================================== -->
 
@@ -503,6 +458,100 @@
 
       const AUTH_KEY =
         "cktsage-auth";
+
+
+      // ===================================================
+      // SAFE RETURN DESTINATION
+      // ===================================================
+
+      function getNextPage() {
+
+        const params =
+          new URLSearchParams(
+            window.location.search
+          );
+
+
+        const requested =
+          params.get("next");
+
+
+        // Only CKTSage local pages may be used.
+        // This prevents external redirect abuse.
+
+        const allowedPages =
+          new Set([
+            "index.html",
+            "chat.html",
+            "library.html",
+            "profile.html",
+            "simulation.html"
+          ]);
+
+
+        if (
+          requested &&
+          allowedPages.has(requested)
+        ) {
+
+          return requested;
+        }
+
+
+        return "index.html";
+      }
+
+
+      const nextPage =
+        getNextPage();
+
+
+      // ===================================================
+      // CHECK EXISTING SAVED LOGIN
+      // ===================================================
+
+      let existingAuth =
+        null;
+
+
+      try {
+
+        existingAuth =
+          JSON.parse(
+            localStorage.getItem(
+              AUTH_KEY
+            ) || "null"
+          );
+
+      } catch (error) {
+
+        console.error(
+          "Could not read saved login:",
+          error
+        );
+
+        existingAuth =
+          null;
+      }
+
+
+      // If already logged in, there is no reason
+      // to show the login page again.
+      //
+      // login.html?next=chat.html -> chat.html
+      // login.html                -> index.html
+
+      if (
+        existingAuth &&
+        existingAuth.access_token
+      ) {
+
+        window.location.replace(
+          nextPage
+        );
+
+        return;
+      }
 
 
       // ===================================================
@@ -1100,7 +1149,9 @@
 
 
               showMessage(
-                "Account created. Sign in with your new account."
+                nextPage === "chat.html"
+                  ? "Account created. Sign in to continue to Chat."
+                  : "Account created. Sign in with your new account."
               );
 
 
@@ -1168,11 +1219,11 @@
 
 
               // =============================================
-              // LOGIN -> INDEX
+              // RETURN TO REQUESTED PAGE
               // =============================================
 
               window.location.replace(
-                "index.html"
+                nextPage
               );
 
             }

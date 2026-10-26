@@ -31,48 +31,12 @@
 
 
   <!-- =====================================================
-       LOGIN CHECK
-       No saved login -> login.html
-       Saved login -> stay on index.html
+       PUBLIC HOMEPAGE
+       No login is required to view index.html.
+
+       Protected destinations such as Chat are handled
+       below and by their own page logic.
   ====================================================== -->
-
-  <script>
-    (() => {
-
-      const AUTH_KEY =
-        "cktsage-auth";
-
-      let auth =
-        null;
-
-      try {
-
-        auth =
-          JSON.parse(
-            localStorage.getItem(
-              AUTH_KEY
-            ) || "null"
-          );
-
-      } catch (error) {
-
-        auth =
-          null;
-      }
-
-      if (
-        !auth ||
-        !auth.access_token
-      ) {
-
-        window.location.replace(
-          "login.html"
-        );
-
-      }
-
-    })();
-  </script>
 
 
   <div class="ambient ambient-one"></div>
@@ -289,13 +253,25 @@
         Workbench
       </a>
 
-      <a href="chat.html">
+
+      <!--
+        Protected Chat link.
+
+        script.js checks whether cktsage-auth exists.
+      -->
+
+      <a
+        href="chat.html"
+        data-protected-chat
+      >
         Chat
       </a>
+
 
       <a href="#features">
         Explore
       </a>
+
 
       <a href="#about">
         About
@@ -307,12 +283,18 @@
     <div class="header-actions">
 
 
-      <!-- LOGGED-IN PROFILE -->
+      <!--
+        Logged in:
+          Account -> profile.html
+
+        Logged out:
+          Sign in -> login.html
+      -->
 
       <a
         class="login-link user-profile-link"
         id="user-profile-link"
-        href="profile.html"
+        href="login.html"
       >
 
         <span
@@ -323,7 +305,7 @@
         </span>
 
         <span id="user-profile-name">
-          Account
+          Sign in
         </span>
 
       </a>
@@ -353,7 +335,9 @@
   <main>
 
 
-    <!-- HERO -->
+    <!-- ===================================================
+         HERO
+    ==================================================== -->
 
     <section
       class="hero reveal"
@@ -1164,12 +1148,15 @@
 
 
   <!-- =====================================================
-       LOGGED-IN PROFILE NAME
+       AUTH / PROFILE DISPLAY
   ====================================================== -->
 
   <script>
 
     (() => {
+
+      "use strict";
+
 
       const AUTH_KEY =
         "cktsage-auth";
@@ -1208,10 +1195,19 @@
 
       } catch (error) {
 
+        console.error(
+          "Could not read saved login:",
+          error
+        );
+
         auth =
           null;
       }
 
+
+      // ===================================================
+      // LOGGED IN
+      // ===================================================
 
       if (
         auth &&
@@ -1231,6 +1227,10 @@
           false;
 
 
+      // ===================================================
+      // LOGGED OUT
+      // ===================================================
+
       } else {
 
         profileLink.href =
@@ -1245,14 +1245,17 @@
           true;
       }
 
+
     })();
 
   </script>
 
 
-  <!-- EXISTING HOMEPAGE LOGIC -->
+  <!-- =====================================================
+       HOMEPAGE LOGIC
+  ====================================================== -->
 
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=4"></script>
 
 
 </body>
