@@ -55,18 +55,7 @@
     auth = null;
   }
 
-
-  // =====================================================
-  // CHAT IS A PROTECTED PAGE
-  //
-  // Homepage is public.
-  // Chat requires a saved login.
-  //
-  // If the user reaches Chat without authentication,
-  // Login remembers that Chat was the requested page.
-  // =====================================================
-  // Guest mode: pages remain accessible without signing in.
-const TOKEN =
+  const TOKEN =
     auth?.access_token || "";
 
 
@@ -221,8 +210,6 @@ const TOKEN =
     }
 
 
-    // Do not automatically delete local authentication.
-    // CKTSage keeps the saved login until manual sign out.
     if (
       response.status === 401
     ) {
@@ -1773,32 +1760,14 @@ const TOKEN =
 
 
   // =====================================================
-  // SAVE MESSAGE
-  // =====================================================
-
-  async function saveMessage(
-    conversationId,
-    role,
-    content
-  ) {
-    return apiFetch(
-      `/conversations/${conversationId}/messages`,
-      {
-        method:
-          "POST",
-
-        body:
-          JSON.stringify({
-            role,
-            content
-          })
-      }
-    );
-  }
-
-
-  // =====================================================
   // ASK AI
+  //
+  // IMPORTANT:
+  // The backend /ai route saves BOTH the user's message
+  // and the assistant's response.
+  //
+  // Do not separately POST these messages to /messages.
+  // Doing so creates duplicate database rows.
   // =====================================================
 
   async function askAI(
@@ -1905,12 +1874,9 @@ const TOKEN =
       }
 
 
-      await saveMessage(
-        activeConversationId,
-        "user",
-        text
-      );
-
+      // IMPORTANT:
+      // /ai already stores the user message and AI response.
+      // Do not call POST /messages here.
 
       const result =
         await askAI(
@@ -1944,12 +1910,8 @@ const TOKEN =
       );
 
 
-      await saveMessage(
-        activeConversationId,
-        "assistant",
-        reply
-      );
-
+      // No separate assistant save is needed.
+      // The backend /ai endpoint has already stored it.
 
       await loadConversations();
 
@@ -2016,6 +1978,8 @@ const TOKEN =
     );
 
 
+    // Always clear the current DOM before loading
+    // messages from the backend.
     thread.innerHTML =
       "";
 
@@ -2588,17 +2552,6 @@ const TOKEN =
 
   // =====================================================
   // RECEIVE PROMPT FROM INDEX
-  //
-  // There are now two possible sources:
-  //
-  // 1. Logged-in user:
-  //    chat.html?prompt=...
-  //
-  // 2. Logged-out user:
-  //    index saves cktsage-pending-prompt
-  //    -> Login
-  //    -> Chat
-  //    -> read pending prompt here
   // =====================================================
 
   async function handleIncomingPrompt() {
@@ -2614,8 +2567,6 @@ const TOKEN =
       );
 
 
-    // URL prompt gets priority.
-    // Otherwise use the question preserved before Login.
     if (
       !incomingPrompt
     ) {
@@ -2638,16 +2589,11 @@ const TOKEN =
       incomingPrompt.trim();
 
 
-    // IMPORTANT:
-    // Remove the pending prompt only once Chat has
-    // successfully reached the point where it can process it.
     localStorage.removeItem(
       PENDING_PROMPT_KEY
     );
 
 
-    // Remove ?prompt= from the address bar so refreshing
-    // Chat does not automatically submit the same question.
     try {
       history.replaceState(
         null,
@@ -2718,9 +2664,6 @@ const TOKEN =
       }
 
 
-      // Must run AFTER conversation initialization.
-      // This prevents the incoming Index question from
-      // being lost during Chat startup.
       await handleIncomingPrompt();
 
     } catch (error) {
