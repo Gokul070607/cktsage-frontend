@@ -382,3 +382,56 @@ html { scroll-padding-top: 76px; }
   .hero-art { transform: scale(.72); margin-bottom: -82px; }
   .ask-section { padding: 18px 12px; }
 }
+
+
+
+/* CKTSage polish: page transitions, refined surfaces, and accessible motion */
+:root {
+  --cktsage-accent: var(--accent, #ffd43b);
+  --cktsage-ease: cubic-bezier(.22, 1, .36, 1);
+}
+html { scroll-behavior: smooth; }
+body {
+  animation: cktsage-page-in .42s var(--cktsage-ease) both;
+}
+@keyframes cktsage-page-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+a, button, input, textarea, select, [role="button"] {
+  transition:
+    color .18s ease,
+    background-color .2s ease,
+    border-color .2s ease,
+    box-shadow .22s ease,
+    transform .22s var(--cktsage-ease),
+    opacity .2s ease;
+}
+button:hover, [role="button"]:hover {
+  transform: translateY(-1px);
+}
+button:active, [role="button"]:active {
+  transform: translateY(0) scale(.985);
+}
+a:focus-visible, button:focus-visible, input:focus-visible,
+textarea:focus-visible, select:focus-visible, [role="button"]:focus-visible {
+  outline: 2px solid var(--cktsage-accent);
+  outline-offset: 3px;
+}
+.card, .panel, .auth-card, .composer, .prompt-card, .resource-card,
+.library-card, .profile-card, .simulation-panel {
+  transition: border-color .25s ease, box-shadow .25s ease, transform .25s var(--cktsage-ease);
+}
+.card:hover, .resource-card:hover, .library-card:hover {
+  border-color: color-mix(in srgb, var(--cktsage-accent) 35%, transparent);
+}
+::selection { background: color-mix(in srgb, var(--cktsage-accent) 35%, transparent); }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

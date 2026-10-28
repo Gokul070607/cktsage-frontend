@@ -14,52 +14,7 @@
 
 <body>
 
-  <script>
-    (() => {
-
-      const AUTH_KEY =
-        "cktsage-auth";
-
-
-      let auth =
-        null;
-
-
-      try {
-
-        auth =
-          JSON.parse(
-            localStorage.getItem(
-              AUTH_KEY
-            ) || "null"
-          );
-
-      } catch (error) {
-
-        auth =
-          null;
-      }
-
-
-      if (
-        auth &&
-        auth.access_token
-      ) {
-
-        window.location.replace(
-          "index.html"
-        );
-
-      } else {
-
-        window.location.replace(
-          "login.html"
-        );
-
-      }
-
-    })();
-  </script>
+  <script>window.location.replace("index.html");</script>
 
 </body>
 

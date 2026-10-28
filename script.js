@@ -33,14 +33,8 @@
   }
 
   function openChat() {
-    if (isLoggedIn()) {
-      window.location.href = "chat.html";
-      return;
-    }
-
-    window.location.href =
-      "login.html?next=" +
-      encodeURIComponent("chat.html");
+    // Keep the chat discoverable without requiring an account first.
+    window.location.href = "chat.html";
   }
 
 

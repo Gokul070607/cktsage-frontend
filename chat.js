@@ -65,24 +65,9 @@
   // If the user reaches Chat without authentication,
   // Login remembers that Chat was the requested page.
   // =====================================================
-
-  if (
-    !auth ||
-    !auth.access_token
-  ) {
-    window.location.replace(
-      "login.html?next=" +
-      encodeURIComponent(
-        "chat.html"
-      )
-    );
-
-    return;
-  }
-
-
-  const TOKEN =
-    auth.access_token;
+  // Guest mode: pages remain accessible without signing in.
+const TOKEN =
+    auth?.access_token || "";
 
 
   // =====================================================

@@ -56,22 +56,9 @@
 
     auth = null;
   }
-
-
-  if (
-    !auth ||
-    !auth.access_token
-  ) {
-    window.location.replace(
-      "login.html"
-    );
-
-    return;
-  }
-
-
-  const TOKEN =
-    auth.access_token;
+  // Guest mode: pages remain accessible without signing in.
+const TOKEN =
+    auth?.access_token || "";
 
 
   // =====================================================
